@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.util.Map;
 
 /**
@@ -14,8 +15,22 @@ import java.util.Map;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity(name = "recipe")
+@Table(name = "recipes")
 public class Recipe {
 
+    @Id
+    @GeneratedValue(
+            strategy = GenerationType.IDENTITY
+    )
+    @Column(
+            updatable = false
+    )
     private Long id;
-    private Map<Long, String> steps;
+
+    @Column(
+            name = "steps",
+            columnDefinition = "TEXT"
+    )
+    private String steps;
 }
