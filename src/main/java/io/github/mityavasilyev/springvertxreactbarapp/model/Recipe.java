@@ -7,6 +7,9 @@ import lombok.Setter;
 
 import java.util.Map;
 
+/**
+ * Stores steps of the recipe for a cocktail
+ */
 @Getter
 @Setter
 @AllArgsConstructor
