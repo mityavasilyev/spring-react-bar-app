@@ -13,6 +13,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @ToString(includeFieldNames = false)
 @Entity(name = "cocktail")
 @Table(name = "cocktails")
@@ -61,7 +62,9 @@ public class Cocktail {
     )
     private Set<Ingredient> ingredients;
 
-    @OneToOne
+    @OneToOne(
+            cascade = CascadeType.ALL
+    )
     private Recipe recipe;
 
     @Column(

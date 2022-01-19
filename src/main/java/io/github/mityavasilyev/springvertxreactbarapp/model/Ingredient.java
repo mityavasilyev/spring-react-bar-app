@@ -1,9 +1,6 @@
 package io.github.mityavasilyev.springvertxreactbarapp.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -14,6 +11,7 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity(name = "ingredient")
 @Table(name = "ingredients")
 public class Ingredient {
