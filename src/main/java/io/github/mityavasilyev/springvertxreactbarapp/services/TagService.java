@@ -1,10 +1,15 @@
 package io.github.mityavasilyev.springvertxreactbarapp.services;
 
+import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
 import io.github.mityavasilyev.springvertxreactbarapp.model.Tag;
 import io.github.mityavasilyev.springvertxreactbarapp.repositories.TagRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class TagService {
@@ -28,7 +33,12 @@ public class TagService {
      * @return  tag with provided id
      */
     public Tag getById(Long id) {
-        return tagRepository.findById(id).get();
+        Optional<Tag> tag = tagRepository.findById(id);
+        if (tag.isPresent()) {
+            return tag.get();
+        } else {
+            throw new ResponseStatusException(NOT_FOUND, "No tag with such id");
+        }
     }
 
     /**

@@ -3,8 +3,12 @@ package io.github.mityavasilyev.springvertxreactbarapp.services;
 import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
 import io.github.mityavasilyev.springvertxreactbarapp.repositories.CocktailRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 public class CocktailService {
@@ -27,7 +31,12 @@ public class CocktailService {
      * @return cocktail with matching id
      */
     public Cocktail getById(Long id) {
-        return cocktailRepository.findById(id).get();
+        Optional<Cocktail> cocktail = cocktailRepository.findById(id);
+        if (cocktail.isPresent()) {
+            return cocktail.get();
+        } else {
+            throw new ResponseStatusException(NOT_FOUND, "No cocktail with such id");
+        }
     }
 
     /**
