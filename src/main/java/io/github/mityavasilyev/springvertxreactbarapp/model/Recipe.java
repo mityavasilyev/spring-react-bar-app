@@ -3,7 +3,6 @@ package io.github.mityavasilyev.springvertxreactbarapp.model;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Map;
 
 /**
  * Stores steps of the recipe for a cocktail

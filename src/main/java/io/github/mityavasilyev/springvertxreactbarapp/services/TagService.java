@@ -1,6 +1,5 @@
 package io.github.mityavasilyev.springvertxreactbarapp.services;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
 import io.github.mityavasilyev.springvertxreactbarapp.model.Tag;
 import io.github.mityavasilyev.springvertxreactbarapp.repositories.TagRepository;
 import org.springframework.stereotype.Service;
@@ -29,8 +28,9 @@ public class TagService {
 
     /**
      * Retrieves tag by id
+     *
      * @param id id of the tag
-     * @return  tag with provided id
+     * @return tag with provided id
      */
     public Tag getById(Long id) {
         Optional<Tag> tag = tagRepository.findById(id);
@@ -43,6 +43,7 @@ public class TagService {
 
     /**
      * Retrieves all tags with name containing provided string
+     *
      * @param name string to search for
      * @return matching tags
      */

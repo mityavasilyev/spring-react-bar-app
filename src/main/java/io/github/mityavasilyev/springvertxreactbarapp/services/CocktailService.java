@@ -2,7 +2,6 @@ package io.github.mityavasilyev.springvertxreactbarapp.services;
 
 import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
 import io.github.mityavasilyev.springvertxreactbarapp.repositories.CocktailRepository;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 

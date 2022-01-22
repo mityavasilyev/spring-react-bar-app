@@ -1,7 +1,6 @@
 package io.github.mityavasilyev.springvertxreactbarapp.controllers;
 
 import io.github.mityavasilyev.springvertxreactbarapp.model.Tag;
-import io.github.mityavasilyev.springvertxreactbarapp.repositories.TagRepository;
 import io.github.mityavasilyev.springvertxreactbarapp.services.TagService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

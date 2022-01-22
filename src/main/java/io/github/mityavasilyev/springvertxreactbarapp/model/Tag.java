@@ -19,10 +19,6 @@ import javax.persistence.*;
 @Table(name = "tags")
 public class Tag {
 
-    public Tag(String name) {
-        this.name = name;
-    }
-
     @Id
     @SequenceGenerator(
             name = "tag_sequence",
@@ -35,11 +31,14 @@ public class Tag {
     )
     @Column(updatable = false)
     private Long id;
-
     @Column(
             name = "name",
             nullable = false,
             columnDefinition = "TEXT"
     )
     private String name;
+
+    public Tag(String name) {
+        this.name = name;
+    }
 }

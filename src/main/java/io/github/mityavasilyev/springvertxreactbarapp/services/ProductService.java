@@ -1,6 +1,5 @@
 package io.github.mityavasilyev.springvertxreactbarapp.services;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
 import io.github.mityavasilyev.springvertxreactbarapp.model.Product;
 import io.github.mityavasilyev.springvertxreactbarapp.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -42,6 +41,7 @@ public class ProductService {
 
     /**
      * Retrieves all products with name containing provided string
+     *
      * @param name string to search for
      * @return matching products
      */
