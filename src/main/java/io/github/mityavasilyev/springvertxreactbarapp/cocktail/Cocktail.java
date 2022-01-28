@@ -1,5 +1,8 @@
-package io.github.mityavasilyev.springvertxreactbarapp.model;
+package io.github.mityavasilyev.springvertxreactbarapp.cocktail;
 
+import io.github.mityavasilyev.springvertxreactbarapp.extra.Ingredient;
+import io.github.mityavasilyev.springvertxreactbarapp.extra.Recipe;
+import io.github.mityavasilyev.springvertxreactbarapp.tag.Tag;
 import lombok.*;
 
 import javax.persistence.*;

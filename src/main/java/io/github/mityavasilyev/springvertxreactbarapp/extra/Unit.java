@@ -1,4 +1,4 @@
-package io.github.mityavasilyev.springvertxreactbarapp.model;
+package io.github.mityavasilyev.springvertxreactbarapp.extra;
 
 /**
  * Provides unit type constants for measurements

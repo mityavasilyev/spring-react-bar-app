@@ -1,7 +1,5 @@
-package io.github.mityavasilyev.springvertxreactbarapp.controllers;
+package io.github.mityavasilyev.springvertxreactbarapp.product;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Product;
-import io.github.mityavasilyev.springvertxreactbarapp.services.ProductService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

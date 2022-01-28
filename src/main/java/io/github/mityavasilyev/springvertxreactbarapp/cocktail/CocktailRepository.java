@@ -1,6 +1,6 @@
-package io.github.mityavasilyev.springvertxreactbarapp.repositories;
+package io.github.mityavasilyev.springvertxreactbarapp.cocktail;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

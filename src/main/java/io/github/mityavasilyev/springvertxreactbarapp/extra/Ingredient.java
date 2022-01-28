@@ -1,20 +1,21 @@
-package io.github.mityavasilyev.springvertxreactbarapp.model;
+package io.github.mityavasilyev.springvertxreactbarapp.extra;
 
+import io.github.mityavasilyev.springvertxreactbarapp.product.Product;
 import lombok.*;
 
 import javax.persistence.*;
 
 /**
- * Describes consumable that will be used for ingredient
+ * Describes ingredient that links to a source product
  */
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "product")
-@Table(name = "products")
-public class Product {
+@Entity(name = "ingredient")
+@Table(name = "ingredients")
+public class Ingredient {
 
     @Id
     @GeneratedValue(
@@ -38,10 +39,17 @@ public class Product {
     )
     private String description;
 
-    @Column(
-            name = "amount_left"
+    @ManyToOne
+    @JoinColumn(
+            name = "product_id",
+            referencedColumnName = "id"
     )
-    private Double amountLeft;
+    private Product sourceProduct;
+
+    @Column(
+            name = "amount"
+    )
+    private Double amount;
 
     @Enumerated(EnumType.STRING)
     private Unit unit;

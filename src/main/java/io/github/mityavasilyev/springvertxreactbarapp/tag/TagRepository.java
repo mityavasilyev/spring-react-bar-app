@@ -1,6 +1,6 @@
-package io.github.mityavasilyev.springvertxreactbarapp.repositories;
+package io.github.mityavasilyev.springvertxreactbarapp.tag;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Tag;
+import io.github.mityavasilyev.springvertxreactbarapp.tag.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

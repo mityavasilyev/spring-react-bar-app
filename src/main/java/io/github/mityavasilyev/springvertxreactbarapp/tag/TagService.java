@@ -1,7 +1,5 @@
-package io.github.mityavasilyev.springvertxreactbarapp.services;
+package io.github.mityavasilyev.springvertxreactbarapp.tag;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Tag;
-import io.github.mityavasilyev.springvertxreactbarapp.repositories.TagRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 

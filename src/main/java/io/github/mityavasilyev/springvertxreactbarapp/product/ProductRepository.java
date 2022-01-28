@@ -1,6 +1,6 @@
-package io.github.mityavasilyev.springvertxreactbarapp.repositories;
+package io.github.mityavasilyev.springvertxreactbarapp.product;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Product;
+import io.github.mityavasilyev.springvertxreactbarapp.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

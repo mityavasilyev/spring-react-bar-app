@@ -1,14 +1,16 @@
 package io.github.mityavasilyev.springvertxreactbarapp.bootstrap;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.*;
-import io.github.mityavasilyev.springvertxreactbarapp.repositories.CocktailRepository;
-import io.github.mityavasilyev.springvertxreactbarapp.repositories.ProductRepository;
-import io.github.mityavasilyev.springvertxreactbarapp.repositories.TagRepository;
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
+import io.github.mityavasilyev.springvertxreactbarapp.extra.*;
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.CocktailRepository;
+import io.github.mityavasilyev.springvertxreactbarapp.product.Product;
+import io.github.mityavasilyev.springvertxreactbarapp.product.ProductRepository;
+import io.github.mityavasilyev.springvertxreactbarapp.tag.TagRepository;
+import io.github.mityavasilyev.springvertxreactbarapp.tag.Tag;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import javax.transaction.Transactional;
 import java.util.*;
 
 /**

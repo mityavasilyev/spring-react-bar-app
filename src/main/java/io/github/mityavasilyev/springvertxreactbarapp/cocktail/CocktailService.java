@@ -1,7 +1,7 @@
-package io.github.mityavasilyev.springvertxreactbarapp.services;
+package io.github.mityavasilyev.springvertxreactbarapp.cocktail;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
-import io.github.mityavasilyev.springvertxreactbarapp.repositories.CocktailRepository;
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.CocktailRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 

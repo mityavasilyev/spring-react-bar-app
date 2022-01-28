@@ -1,7 +1,5 @@
-package io.github.mityavasilyev.springvertxreactbarapp.controllers;
+package io.github.mityavasilyev.springvertxreactbarapp.cocktail;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Cocktail;
-import io.github.mityavasilyev.springvertxreactbarapp.services.CocktailService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

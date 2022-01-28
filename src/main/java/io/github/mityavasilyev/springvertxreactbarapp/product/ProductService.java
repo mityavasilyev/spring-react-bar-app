@@ -1,7 +1,7 @@
-package io.github.mityavasilyev.springvertxreactbarapp.services;
+package io.github.mityavasilyev.springvertxreactbarapp.product;
 
-import io.github.mityavasilyev.springvertxreactbarapp.model.Product;
-import io.github.mityavasilyev.springvertxreactbarapp.repositories.ProductRepository;
+import io.github.mityavasilyev.springvertxreactbarapp.product.Product;
+import io.github.mityavasilyev.springvertxreactbarapp.product.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
