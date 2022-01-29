@@ -44,6 +44,13 @@ public class CocktailController {
         cocktailService.addNew(cocktail);
     }
 
+    /**
+     * Handles exceptions
+     * @param ex
+     * @param request
+     * @param response
+     * @return
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handle(Exception ex,
                                          HttpServletRequest request, HttpServletResponse response) {
