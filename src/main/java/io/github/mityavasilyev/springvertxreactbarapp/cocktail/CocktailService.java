@@ -1,7 +1,5 @@
 package io.github.mityavasilyev.springvertxreactbarapp.cocktail;
 
-import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
-import io.github.mityavasilyev.springvertxreactbarapp.cocktail.CocktailRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -53,6 +51,16 @@ public class CocktailService {
      */
     public List<Cocktail> getAllByName(String name) {
         return cocktailRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    /**
+     * Saves provided cocktail to the repository
+     *
+     * @param cocktail to save
+     * @return saved cocktail
+     */
+    public Cocktail addNew(Cocktail cocktail) {
+        return cocktailRepository.save(cocktail);
     }
 
 
