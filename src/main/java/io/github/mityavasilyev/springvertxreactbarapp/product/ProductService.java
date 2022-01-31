@@ -1,8 +1,5 @@
 package io.github.mityavasilyev.springvertxreactbarapp.product;
 
-import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
-import io.github.mityavasilyev.springvertxreactbarapp.product.Product;
-import io.github.mityavasilyev.springvertxreactbarapp.product.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -72,7 +69,7 @@ public class ProductService {
     /**
      * Updates product with provided entity
      *
-     * @param id          of product to update
+     * @param id         of product to update
      * @param newProduct new entity
      * @return updated entity
      */

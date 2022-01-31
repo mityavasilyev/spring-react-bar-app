@@ -1,6 +1,5 @@
 package io.github.mityavasilyev.springvertxreactbarapp.product;
 
-import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
 import io.github.mityavasilyev.springvertxreactbarapp.exceptions.ExceptionController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +44,7 @@ public class ProductController extends ExceptionController {
     // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable("productId") Long id,
-                                                   @RequestBody Product productPatch) {
+                                                 @RequestBody Product productPatch) {
         Product product = productService.getById(id);
         if (product == null) return ResponseEntity.notFound().build();
 
