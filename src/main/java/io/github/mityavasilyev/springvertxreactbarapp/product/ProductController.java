@@ -1,15 +1,15 @@
 package io.github.mityavasilyev.springvertxreactbarapp.product;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
+import io.github.mityavasilyev.springvertxreactbarapp.exceptions.ExceptionController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping(path = "api/products")
-public class ProductController {
+public class ProductController extends ExceptionController {
 
     private final ProductService productService;
 
@@ -30,5 +30,29 @@ public class ProductController {
     @GetMapping(path = "{productId}")
     public Product getProductById(@PathVariable("productId") Long id) {
         return productService.getById(id);
+    }
+
+    @PostMapping
+    public void addNewProduct(@RequestBody Product product) {
+        productService.addNew(product);
+    }
+
+    @DeleteMapping(path = "{productId}")
+    public void deleteProduct(@PathVariable("productId") Long id) {
+        productService.deleteById(id);
+    }
+
+    // TODO: 31.01.2022 Update mappings to use ResponseEntity
+    @PatchMapping(path = "{productId}")
+    public ResponseEntity<Product> updateProduct(@PathVariable("productId") Long id,
+                                                   @RequestBody Product productPatch) {
+        Product product = productService.getById(id);
+        if (product == null) return ResponseEntity.notFound().build();
+
+        if (productPatch.getName() != null) product.setName(productPatch.getName());
+        if (productPatch.getDescription() != null) product.setDescription(productPatch.getDescription());
+        product = productService.updateById(id, product);
+
+        return ResponseEntity.ok(product);
     }
 }

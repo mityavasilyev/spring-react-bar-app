@@ -1,11 +1,8 @@
 package io.github.mityavasilyev.springvertxreactbarapp.tag;
 
-import io.github.mityavasilyev.springvertxreactbarapp.tag.Tag;
-import io.github.mityavasilyev.springvertxreactbarapp.tag.TagService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.github.mityavasilyev.springvertxreactbarapp.exceptions.DataNotFoundException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +29,28 @@ public class TagController {
     @GetMapping("/name/{name}")
     public List<Tag> getAllTagsById(@PathVariable("name") String name) {
         return tagService.getAllByName(name);
+    }
+
+    @PostMapping
+    public void addNewTag(@RequestBody Tag tag) {
+        tagService.addNew(tag);
+    }
+
+    @DeleteMapping(path = "{tagId}")
+    public void deleteTag(@PathVariable("tagId") Long id) {
+        tagService.deleteById(id);
+    }
+
+    // TODO: 31.01.2022 Update mappings to use ResponseEntity
+    @PatchMapping(path = "{tagId}")
+    public ResponseEntity<Tag> updateTag(@PathVariable("tagId") Long id,
+                                         @RequestBody Tag tagPatch) throws DataNotFoundException {
+        Tag tag = tagService.getById(id);
+        if (tag == null) return ResponseEntity.notFound().build();
+
+        if (tagPatch.getName() != null) tag.setName(tagPatch.getName());
+        tag = tagService.updateById(id, tag);
+
+        return ResponseEntity.ok(tag);
     }
 }

@@ -72,6 +72,13 @@ public class CocktailService {
         cocktailRepository.deleteById(id);
     }
 
+    /**
+     * Updates cocktail with provided entity
+     *
+     * @param id          of cocktail to update
+     * @param newCocktail new entity
+     * @return updated entity
+     */
     public Cocktail updateById(Long id, Cocktail newCocktail) {
         Optional<Cocktail> cocktail = cocktailRepository.findById(id);
         if (cocktail.isPresent()) {
@@ -81,6 +88,4 @@ public class CocktailService {
             throw new ResponseStatusException(NOT_FOUND, "No cocktail with such id");
         }
     }
-
-
 }

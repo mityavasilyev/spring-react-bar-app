@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springvertxreactbarapp.product;
 
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
 import io.github.mityavasilyev.springvertxreactbarapp.product.Product;
 import io.github.mityavasilyev.springvertxreactbarapp.product.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -47,5 +48,41 @@ public class ProductService {
      */
     public List<Product> getAllByName(String name) {
         return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    /**
+     * Saves provided product to the repository
+     *
+     * @param product to save
+     * @return saved product
+     */
+    public Product addNew(Product product) {
+        return productRepository.save(product);
+    }
+
+    /**
+     * Deletes product with matching id
+     *
+     * @param id of product to delete
+     */
+    public void deleteById(Long id) {
+        productRepository.deleteById(id);
+    }
+
+    /**
+     * Updates product with provided entity
+     *
+     * @param id          of product to update
+     * @param newProduct new entity
+     * @return updated entity
+     */
+    public Product updateById(Long id, Product newProduct) {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            productRepository.save(newProduct);
+            return newProduct;
+        } else {
+            throw new ResponseStatusException(NOT_FOUND, "No product with such id");
+        }
     }
 }

@@ -1,18 +1,14 @@
 package io.github.mityavasilyev.springvertxreactbarapp.cocktail;
 
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
+import io.github.mityavasilyev.springvertxreactbarapp.exceptions.ExceptionController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "api/cocktails")
-public class CocktailController {
+public class CocktailController extends ExceptionController {
     private final CocktailService cocktailService;
 
     public CocktailController(CocktailService cocktailService) {
@@ -52,40 +48,18 @@ public class CocktailController {
     // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{cocktailId}")
     public ResponseEntity<Cocktail> updateCocktail(@PathVariable("cocktailId") Long id,
-                               @RequestBody Cocktail cocktailPatch) {
+                                                   @RequestBody Cocktail cocktailPatch) {
         Cocktail cocktail = cocktailService.getById(id);
         if (cocktail == null) return ResponseEntity.notFound().build();
 
-        if (cocktailPatch.getName() != null)  cocktail.setName(cocktailPatch.getName());
-        if (cocktailPatch.getDescription() != null)  cocktail.setDescription(cocktailPatch.getDescription());
-        if (cocktailPatch.getIngredients() != null)  cocktail.setIngredients(cocktailPatch.getIngredients());
-        if (cocktailPatch.getRecipe() != null)  cocktail.setRecipe(cocktailPatch.getRecipe());
-        if (cocktailPatch.getNote() != null)  cocktail.setNote(cocktailPatch.getNote());
-        if (cocktailPatch.getTags() != null)  cocktail.setTags(cocktailPatch.getTags());
+        if (cocktailPatch.getName() != null) cocktail.setName(cocktailPatch.getName());
+        if (cocktailPatch.getDescription() != null) cocktail.setDescription(cocktailPatch.getDescription());
+        if (cocktailPatch.getIngredients() != null) cocktail.setIngredients(cocktailPatch.getIngredients());
+        if (cocktailPatch.getRecipe() != null) cocktail.setRecipe(cocktailPatch.getRecipe());
+        if (cocktailPatch.getNote() != null) cocktail.setNote(cocktailPatch.getNote());
+        if (cocktailPatch.getTags() != null) cocktail.setTags(cocktailPatch.getTags());
         cocktail = cocktailService.updateById(id, cocktail);
 
         return ResponseEntity.ok(cocktail);
-    }
-
-    /**
-     * Handles exceptions
-     *
-     * @param ex
-     * @param request
-     * @param response
-     * @return
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handle(Exception ex,
-                                         HttpServletRequest request, HttpServletResponse response) {
-        if (ex instanceof NullPointerException) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if (ex instanceof DataIntegrityViolationException) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(ex.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }

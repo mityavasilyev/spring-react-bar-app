@@ -1,5 +1,7 @@
 package io.github.mityavasilyev.springvertxreactbarapp.tag;
 
+import io.github.mityavasilyev.springvertxreactbarapp.cocktail.Cocktail;
+import io.github.mityavasilyev.springvertxreactbarapp.exceptions.DataNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -47,5 +49,41 @@ public class TagService {
      */
     public List<Tag> getAllByName(String name) {
         return tagRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    /**
+     * Saves provided tag to the repository
+     *
+     * @param tag to save
+     * @return saved tag
+     */
+    public Tag addNew(Tag tag) {
+        return tagRepository.save(tag);
+    }
+
+    /**
+     * Deletes tag with matching id
+     *
+     * @param id of tag to delete
+     */
+    public void deleteById(Long id) {
+        tagRepository.deleteById(id);
+    }
+
+    /**
+     * Updates tag with provided entity
+     *
+     * @param id          of tag to update
+     * @param newTag new entity
+     * @return updated entity
+     */
+    public Tag updateById(Long id, Tag newTag) throws DataNotFoundException {
+        Optional<Tag> tag = tagRepository.findById(id);
+        if (tag.isPresent()) {
+            tagRepository.save(newTag);
+            return newTag;
+        } else {
+            throw new DataNotFoundException("No tag with such id");
+        }
     }
 }
