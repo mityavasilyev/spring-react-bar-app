@@ -63,5 +63,24 @@ public class CocktailService {
         return cocktailRepository.save(cocktail);
     }
 
+    /**
+     * Deletes cocktail with matching id
+     *
+     * @param id of cocktail to delete
+     */
+    public void deleteById(Long id) {
+        cocktailRepository.deleteById(id);
+    }
+
+    public Cocktail updateById(Long id, Cocktail newCocktail) {
+        Optional<Cocktail> cocktail = cocktailRepository.findById(id);
+        if (cocktail.isPresent()) {
+            cocktailRepository.save(newCocktail);
+            return newCocktail;
+        } else {
+            throw new ResponseStatusException(NOT_FOUND, "No cocktail with such id");
+        }
+    }
+
 
 }
