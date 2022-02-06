@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.github.mityavasilyev</groupId>
-    <artifactId>spring-vertx-react-bar-app</artifactId>
+    <artifactId>spring-react-bar-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-vertx-react-bar-app</name>
     <description>Demo project for Spring Boot</description>
