@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -93,21 +92,37 @@ public class ProductService {
         }
     }
 
+    /**
+     * Consumes products that are sources of provided ingredients.
+     * If there's some problem with consuming some product - aborts whole process (transactional).
+     *
+     * @param consumables List of ingredients to consume
+     * @return list of affected products after consumption
+     * @throws NotEnoughProductException if there's not enough product to consume
+     * @throws UnitMismatchException     if there's unit mismatch between product and ingredient
+     */
     @Transactional(rollbackFor = {NotEnoughProductException.class})
-    public List<Product> consume(Map<Product, Ingredient> consumables)
+    public List<Product> consumeIngredients(List<Ingredient> consumables)
             throws NotEnoughProductException, UnitMismatchException {
         List<Product> affectedProducts = new ArrayList<>();
-        for (Map.Entry<Product, Ingredient> entry : consumables.entrySet()) {
-            Product product = entry.getKey();
-            Ingredient ingredient = entry.getValue();
-
-            affectedProducts.add(consumeOne(product.getId(), ingredient));
+        for (Ingredient ingredient : consumables) {
+            affectedProducts.add(consumeOneIngredient(ingredient.getSourceProduct().getId(), ingredient));
         }
         return affectedProducts;
     }
 
-    private Product consumeOne(Long productId, Ingredient ingredient)
+    /**
+     * Consumes one product with provided ingredient
+     *
+     * @param productId  Source product id
+     * @param ingredient Ingredient to consume
+     * @return Product after consumption
+     * @throws NotEnoughProductException
+     * @throws UnitMismatchException
+     */
+    private Product consumeOneIngredient(Long productId, Ingredient ingredient)
             throws NotEnoughProductException, UnitMismatchException {
+        // TODO: 06.02.2022 Stop providing ingredient. Use more generic argument instead
         Product consumable = getById(productId);
         AmountUnit productAmountUnit = standardizeUnit(consumable.getAmountLeft(), consumable.getUnit());
         AmountUnit ingredientAmountUnit = standardizeUnit(ingredient.getAmount(), ingredient.getUnit());
@@ -136,6 +151,13 @@ public class ProductService {
         }
     }
 
+    /**
+     * Standardizes provided amount and unit to use standard values
+     *
+     * @param amount amount that needs to be standardized
+     * @param unit   unit that needs to be standardized
+     * @return an AmountUnit that contains standard amount and unit
+     */
     private AmountUnit standardizeUnit(Double amount, Unit unit) {
         return switch (unit) {
             case MILLILITER, PIECE, GRAM -> new AmountUnit(amount, unit);
