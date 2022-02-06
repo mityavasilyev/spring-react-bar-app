@@ -2,6 +2,7 @@ package io.github.mityavasilyev.springvertxreactbarapp.product;
 
 import io.github.mityavasilyev.springvertxreactbarapp.exceptions.ExceptionController;
 import io.github.mityavasilyev.springvertxreactbarapp.exceptions.NotEnoughProductException;
+import io.github.mityavasilyev.springvertxreactbarapp.exceptions.UnitMismatchException;
 import io.github.mityavasilyev.springvertxreactbarapp.extra.Ingredient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,10 +69,10 @@ public class ProductController extends ExceptionController {
      */
     @PostMapping(path = "/consume")
     public ResponseEntity<Object> consumeProducts(@RequestBody List<Ingredient> ingredients)
-            throws NotEnoughProductException {
-        Map<Product, Double> consumables = new HashMap<>();
+            throws NotEnoughProductException, UnitMismatchException {
+        Map<Product, Ingredient> consumables = new HashMap<>();
         ingredients.forEach(ingredient ->
-                consumables.put(ingredient.getSourceProduct(), ingredient.getAmount()));
+                consumables.put(ingredient.getSourceProduct(), ingredient));
 
         List<Product> products = productService.consume(consumables);
         return ResponseEntity.ok(products);

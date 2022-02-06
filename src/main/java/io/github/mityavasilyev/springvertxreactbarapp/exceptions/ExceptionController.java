@@ -41,6 +41,11 @@ public abstract class ExceptionController {
                     .status(HttpStatus.NOT_ACCEPTABLE)
                     .body(ex.getMessage());
         }
+        if (ex instanceof UnitMismatchException) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_ACCEPTABLE)
+                    .body(ex.getMessage());
+        }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }

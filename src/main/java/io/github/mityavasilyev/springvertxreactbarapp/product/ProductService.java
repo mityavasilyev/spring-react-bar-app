@@ -1,10 +1,11 @@
 package io.github.mityavasilyev.springvertxreactbarapp.product;
 
 import io.github.mityavasilyev.springvertxreactbarapp.exceptions.NotEnoughProductException;
+import io.github.mityavasilyev.springvertxreactbarapp.exceptions.UnitMismatchException;
 import io.github.mityavasilyev.springvertxreactbarapp.extra.Ingredient;
+import io.github.mityavasilyev.springvertxreactbarapp.extra.Unit;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -60,6 +61,9 @@ public class ProductService {
      * @return saved product
      */
     public Product addNew(Product product) {
+        AmountUnit amountUnit = standardizeUnit(product.getAmountLeft(), product.getUnit());
+        product.setAmountLeft(amountUnit.getAmount());
+        product.setUnit(amountUnit.getUnit());
         return productRepository.save(product);
     }
 
@@ -90,33 +94,76 @@ public class ProductService {
     }
 
     @Transactional(rollbackFor = {NotEnoughProductException.class})
-    public List<Product> consume(Map<Product, Double> consumables) throws NotEnoughProductException {
+    public List<Product> consume(Map<Product, Ingredient> consumables)
+            throws NotEnoughProductException, UnitMismatchException {
         List<Product> affectedProducts = new ArrayList<>();
-        for (Map.Entry<Product, Double> entry : consumables.entrySet()) {
+        for (Map.Entry<Product, Ingredient> entry : consumables.entrySet()) {
             Product product = entry.getKey();
-            Double amount = entry.getValue();
+            Ingredient ingredient = entry.getValue();
 
-            affectedProducts.add(consumeOne(product.getId(), amount));
+            affectedProducts.add(consumeOne(product.getId(), ingredient));
         }
         return affectedProducts;
     }
 
-    private Product consumeOne(Long productId, Double amount) throws NotEnoughProductException {
+    private Product consumeOne(Long productId, Ingredient ingredient)
+            throws NotEnoughProductException, UnitMismatchException {
         Product consumable = getById(productId);
-        if (consumable.getAmountLeft() > 0 && !((consumable.getAmountLeft() - amount) < 0)) {
+        AmountUnit productAmountUnit = standardizeUnit(consumable.getAmountLeft(), consumable.getUnit());
+        AmountUnit ingredientAmountUnit = standardizeUnit(ingredient.getAmount(), ingredient.getUnit());
+        if (!productAmountUnit.getUnit().equals(ingredientAmountUnit.getUnit()))
+            throw new UnitMismatchException(
+                    String.format(
+                            "Can't consume %s because source product is in %s",
+                            ingredientAmountUnit.getUnit(),
+                            productAmountUnit.getUnit()));
+        if (productAmountUnit.getAmount() > 0
+                && !((productAmountUnit.getAmount() - ingredientAmountUnit.getAmount()) < 0)) {
             consumable.setAmountLeft(
-                    consumable.getAmountLeft() - amount
+                    productAmountUnit.getAmount() - ingredientAmountUnit.getAmount()
             );
+            consumable.setUnit(productAmountUnit.getUnit());
             productRepository.save(consumable);
             return consumable;
         } else {
             throw new NotEnoughProductException(
                     String.format("Can't consume %s %s of %s (available: %s)",
-                            amount.toString(),
+                            ingredient.getUnit().toString(),
                             consumable.getUnit().toString(),
                             consumable.getName(),
                             consumable.getAmountLeft().toString()
                     ));
+        }
+    }
+
+    private AmountUnit standardizeUnit(Double amount, Unit unit) {
+        return switch (unit) {
+            case MILLILITER, PIECE, GRAM -> new AmountUnit(amount, unit);
+            case LITER -> new AmountUnit((Double.valueOf(amount) * 1000), Unit.MILLILITER);
+            case OUNCE -> new AmountUnit((Double.valueOf(amount) * 30), Unit.MILLILITER);
+            default -> throw new IllegalStateException("Unexpected value: " + unit);
+        };
+    }
+
+
+    final class AmountUnit {
+        private final Double amount;
+        private final Unit unit;
+
+        /**
+         * Used to return standardized unit in {@link #standardizeUnit(Double, Unit)}
+         */
+        AmountUnit(Double amount, Unit unit) {
+            this.amount = amount;
+            this.unit = unit;
+        }
+
+        public Double getAmount() {
+            return amount;
+        }
+
+        public Unit getUnit() {
+            return unit;
         }
     }
 }
