@@ -70,11 +70,8 @@ public class ProductController extends ExceptionController {
     @PostMapping(path = "/consume")
     public ResponseEntity<Object> consumeProducts(@RequestBody List<Ingredient> ingredients)
             throws NotEnoughProductException, UnitMismatchException {
-        Map<Product, Ingredient> consumables = new HashMap<>();
-        ingredients.forEach(ingredient ->
-                consumables.put(ingredient.getSourceProduct(), ingredient));
 
-        List<Product> products = productService.consume(consumables);
+        List<Product> products = productService.consumeIngredients(ingredients);
         return ResponseEntity.ok(products);
 
     }
