@@ -5,6 +5,7 @@ import io.github.mityavasilyev.springvertxreactbarapp.extra.*;
 import io.github.mityavasilyev.springvertxreactbarapp.cocktail.CocktailRepository;
 import io.github.mityavasilyev.springvertxreactbarapp.product.Product;
 import io.github.mityavasilyev.springvertxreactbarapp.product.ProductRepository;
+import io.github.mityavasilyev.springvertxreactbarapp.product.ProductService;
 import io.github.mityavasilyev.springvertxreactbarapp.tag.TagRepository;
 import io.github.mityavasilyev.springvertxreactbarapp.tag.Tag;
 import org.springframework.context.ApplicationListener;
@@ -21,14 +22,14 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
     private final TagRepository tagRepository;
     private final CocktailRepository cocktailRepository;
-    private final ProductRepository productRepository;
+    private final ProductService productService;
 
     public DevBootstrap(TagRepository tagRepository,
                         CocktailRepository cocktailRepository,
-                        ProductRepository productRepository) {
+                        ProductService productService) {
         this.tagRepository = tagRepository;
         this.cocktailRepository = cocktailRepository;
-        this.productRepository = productRepository;
+        this.productService = productService;
     }
 
     @Override
@@ -65,7 +66,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                 .description("Supa fresh")
                 .build();
         products.add(lemon);
-        productRepository.saveAll(products);
+        products.stream().forEach(productService::addNew);
 
         Cocktail cocktail1 = Cocktail.builder()
                 .name("Cuba Libre")
