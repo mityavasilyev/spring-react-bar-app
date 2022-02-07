@@ -8,9 +8,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class SpringReactBarAppApplicationTest {
 
-//    @Test
-//    void contextLoads() {
-//        assertEquals(true, true);
-//    }
+    @Test
+    void contextLoads() {
+    }
 
 }

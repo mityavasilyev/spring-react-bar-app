@@ -1,6 +1,5 @@
 package io.github.mityavasilyev.springreactbarapp.tag;
 
-import io.github.mityavasilyev.springreactbarapp.exceptions.DataNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -72,17 +71,17 @@ public class TagService {
     /**
      * Updates tag with provided entity
      *
-     * @param id          of tag to update
+     * @param id     of tag to update
      * @param newTag new entity
      * @return updated entity
      */
-    public Tag updateById(Long id, Tag newTag) throws DataNotFoundException {
+    public Tag updateById(Long id, Tag newTag) {
         Optional<Tag> tag = tagRepository.findById(id);
         if (tag.isPresent()) {
             tagRepository.save(newTag);
             return newTag;
         } else {
-            throw new DataNotFoundException("No tag with such id");
+            throw new ResponseStatusException(NOT_FOUND, "No tag with such id");
         }
     }
 }

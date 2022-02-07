@@ -161,8 +161,8 @@ public class ProductService {
     private AmountUnit standardizeUnit(Double amount, Unit unit) {
         return switch (unit) {
             case MILLILITER, PIECE, GRAM -> new AmountUnit(amount, unit);
-            case LITER -> new AmountUnit((Double.valueOf(amount) * 1000), Unit.MILLILITER);
-            case OUNCE -> new AmountUnit((Double.valueOf(amount) * 30), Unit.MILLILITER);
+            case LITER -> new AmountUnit((amount * 1000), Unit.MILLILITER);
+            case OUNCE -> new AmountUnit((amount * 30), Unit.MILLILITER);
             default -> throw new IllegalStateException("Unexpected value: " + unit);
         };
     }
