@@ -21,6 +21,20 @@ import java.util.*;
 @Component
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
+    public static final String RUM = "Rum";
+    public static final String COLD = "Cold";
+    public static final String SWEET = "Sweet";
+    public static final String BITTER = "Bitter";
+    public static final String COCA_COLA = "Coca Cola";
+    public static final String BACARDI_CARTA_BLANCA = "Bacardi Carta Blanca";
+    public static final String LEMON = "Lemon";
+    public static final String CUBA_LIBRE = "Cuba Libre";
+    public static final String MOJITO = "Mojito";
+    public static final String WHITE_RUM = "White Rum";
+    public static final String SODA = "Soda";
+    public static final String AVIATOR = "Aviator";
+    public static final String GIN = "Gin";
+
     private final TagRepository tagRepository;
     private final CocktailRepository cocktailRepository;
     private final ProductService productService;
@@ -37,31 +51,31 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
         List<Tag> tags = new LinkedList<>();
-        Tag rumTag = new Tag("Rum");
+        Tag rumTag = new Tag(RUM);
         tags.add(rumTag);
-        Tag coldTag = new Tag("Cold");
+        Tag coldTag = new Tag(COLD);
         tags.add(coldTag);
-        Tag sweetTag = new Tag("Sweet");
+        Tag sweetTag = new Tag(SWEET);
         tags.add(sweetTag);
-        Tag bitterTag = new Tag("Bitter");
+        Tag bitterTag = new Tag(BITTER);
         tags.add(bitterTag);
         tagRepository.saveAll(Arrays.asList(rumTag, coldTag, sweetTag, bitterTag));
 
         List<Product> products = new LinkedList<>();
         Product cola = Product.builder()
-                .name("Coca Cola")
+                .name(COCA_COLA)
                 .amountLeft(2d)
                 .unit(Unit.LITER)
                 .build();
         products.add(cola);
         Product bacardi = Product.builder()
-                .name("Bacardi Carta Blanca")
+                .name(BACARDI_CARTA_BLANCA)
                 .amountLeft(0.7d)
                 .unit(Unit.LITER)
                 .build();
         products.add(bacardi);
         Product lemon = Product.builder()
-                .name("Lemon")
+                .name(LEMON)
                 .amountLeft(7d)
                 .unit(Unit.PIECE)
                 .description("Supa fresh")
@@ -70,18 +84,18 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         products.stream().forEach(productService::addNew);
 
         Cocktail cocktail1 = Cocktail.builder()
-                .name("Cuba Libre")
+                .name(CUBA_LIBRE)
                 .description("Taste some of that rum")
                 .note("Empty note")
                 .ingredients(new HashSet<>(Arrays.asList(
                         Ingredient.builder()
-                                .name("Coca-Cola")
+                                .name(COCA_COLA)
                                 .amount(1d)
                                 .unit(Unit.OUNCE)
                                 .sourceProduct(cola)
                                 .build(),
                         Ingredient.builder()
-                                .name("Rum")
+                                .name(RUM)
                                 .amount(1d)
                                 .unit(Unit.OUNCE)
                                 .sourceProduct(bacardi)
@@ -95,24 +109,24 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         cocktailRepository.save(cocktail1);
 
         Cocktail cocktail2 = Cocktail.builder()
-                .name("Mohito")
+                .name(MOJITO)
                 .description("Summertime")
                 .note("with alco")
                 .ingredients(new HashSet<>(Arrays.asList(
                         Ingredient.builder()
-                                .name("White Rum")
+                                .name(WHITE_RUM)
                                 .amount(1d)
                                 .unit(Unit.OUNCE)
                                 .sourceProduct(bacardi)
                                 .build(),
                         Ingredient.builder()
-                                .name("Lemon")
+                                .name(LEMON)
                                 .amount(2d)
                                 .unit(Unit.PIECE)
                                 .sourceProduct(lemon)
                                 .build(),
                         Ingredient.builder()
-                                .name("Soda")
+                                .name(SODA)
                                 .amount(4d)
                                 .unit(Unit.OUNCE)
                                 .build()
@@ -125,22 +139,22 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         cocktailRepository.save(cocktail2);
 
         Cocktail cocktail3 = Cocktail.builder()
-                .name("Aviator")
+                .name(AVIATOR)
                 .description("Bitter guy")
                 .ingredients(new HashSet<>(Arrays.asList(
                         Ingredient.builder()
-                                .name("Gin")
+                                .name(GIN)
                                 .amount(1d)
                                 .unit(Unit.OUNCE)
                                 .build(),
                         Ingredient.builder()
-                                .name("Lemon")
+                                .name(LEMON)
                                 .amount(2d)
                                 .unit(Unit.PIECE)
                                 .sourceProduct(lemon)
                                 .build(),
                         Ingredient.builder()
-                                .name("Soda")
+                                .name(SODA)
                                 .amount(4d)
                                 .unit(Unit.OUNCE)
                                 .build()

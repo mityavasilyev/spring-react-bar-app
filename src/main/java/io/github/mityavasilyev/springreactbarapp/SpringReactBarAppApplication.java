@@ -8,7 +8,6 @@ public class SpringReactBarAppApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(SpringReactBarAppApplication.class, args);
-
     }
 
 }

@@ -61,8 +61,8 @@ public class ProductService {
      */
     public Product addNew(Product product) {
         AmountUnit amountUnit = standardizeUnit(product.getAmountLeft(), product.getUnit());
-        product.setAmountLeft(amountUnit.getAmount());
-        product.setUnit(amountUnit.getUnit());
+        product.setAmountLeft(amountUnit.amount());
+        product.setUnit(amountUnit.unit());
         return productRepository.save(product);
     }
 
@@ -126,27 +126,28 @@ public class ProductService {
         Product consumable = getById(productId);
         AmountUnit productAmountUnit = standardizeUnit(consumable.getAmountLeft(), consumable.getUnit());
         AmountUnit ingredientAmountUnit = standardizeUnit(ingredient.getAmount(), ingredient.getUnit());
-        if (!productAmountUnit.getUnit().equals(ingredientAmountUnit.getUnit()))
+        if (!productAmountUnit.unit().equals(ingredientAmountUnit.unit()))
             throw new UnitMismatchException(
                     String.format(
                             "Can't consume %s because source product is in %s",
-                            ingredientAmountUnit.getUnit(),
-                            productAmountUnit.getUnit()));
-        if (productAmountUnit.getAmount() > 0
-                && !((productAmountUnit.getAmount() - ingredientAmountUnit.getAmount()) < 0)) {
+                            ingredientAmountUnit.unit(),
+                            productAmountUnit.unit()));
+        if (productAmountUnit.amount() > 0
+                && ((productAmountUnit.amount() - ingredientAmountUnit.amount()) >= 0)) {
             consumable.setAmountLeft(
-                    productAmountUnit.getAmount() - ingredientAmountUnit.getAmount()
+                    productAmountUnit.amount() - ingredientAmountUnit.amount()
             );
-            consumable.setUnit(productAmountUnit.getUnit());
+            consumable.setUnit(productAmountUnit.unit());
             productRepository.save(consumable);
             return consumable;
         } else {
             throw new NotEnoughProductException(
-                    String.format("Can't consume %s %s of %s (available: %s)",
+                    String.format("Can't consume %s %s of %s (available: %s %s)",
+                            ingredient.getAmount().toString(),
                             ingredient.getUnit().toString(),
-                            consumable.getUnit().toString(),
                             consumable.getName(),
-                            consumable.getAmountLeft().toString()
+                            consumable.getAmountLeft().toString(),
+                            consumable.getUnit()
                     ));
         }
     }
@@ -168,24 +169,6 @@ public class ProductService {
     }
 
 
-    final class AmountUnit {
-        private final Double amount;
-        private final Unit unit;
-
-        /**
-         * Used to return standardized unit in {@link #standardizeUnit(Double, Unit)}
-         */
-        AmountUnit(Double amount, Unit unit) {
-            this.amount = amount;
-            this.unit = unit;
-        }
-
-        public Double getAmount() {
-            return amount;
-        }
-
-        public Unit getUnit() {
-            return unit;
-        }
+    record AmountUnit(Double amount, Unit unit) {
     }
 }
