@@ -26,12 +26,12 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    private Map<Long, Product> productRepositoryMock;
+    private Map<Long, Product> dummyRepository;
 
     @BeforeEach
     void setUp() {
-        productRepositoryMock = new HashMap<>();
-        productRepositoryMock.put(1l,
+        dummyRepository = new HashMap<>();
+        dummyRepository.put(1l,
                 Product.builder()
                         .id(1l)
                         .name("Cola")
@@ -39,7 +39,7 @@ class ProductServiceTest {
                         .unit(Unit.LITER)
                         .description("Cold Fuzz")
                         .build());
-        productRepositoryMock.put(2l,
+        dummyRepository.put(2l,
                 Product.builder()
                         .id(2l)
                         .name("Sugar")
@@ -55,7 +55,7 @@ class ProductServiceTest {
 
     @Test
     void getAll() {
-        List<Product> mockProducts = new ArrayList<>(productRepositoryMock.values());
+        List<Product> mockProducts = new ArrayList<>(dummyRepository.values());
         Mockito.when(productRepository.findAll())
                 .thenReturn(mockProducts);
         List<Product> products = productService.getAll();
@@ -65,24 +65,24 @@ class ProductServiceTest {
     @Test
     void getById() {
         Mockito.when(productRepository.findById(1l))
-                .thenReturn(Optional.ofNullable(productRepositoryMock.get(1l)));
+                .thenReturn(Optional.ofNullable(dummyRepository.get(1l)));
         Product product = productService.getById(1l);
-        assertSame(productRepositoryMock.get(1l), product);
-        assertEquals(productRepositoryMock.get(1l).getName(), product.getName());
+        assertSame(dummyRepository.get(1l), product);
+        assertEquals(dummyRepository.get(1l).getName(), product.getName());
     }
 
     @Test
     void getAllByName() {
         Mockito.when(productRepository.findByNameContainingIgnoreCase("a"))
-                .thenReturn(productRepositoryMock.values()
+                .thenReturn(dummyRepository.values()
                         .stream()
                         .filter(product -> product.getName().contains("a"))
                         .toList());
         List<Product> products = productService.getAllByName("a");
-        assertEquals(productRepositoryMock.size(), products.size());
+        assertEquals(dummyRepository.size(), products.size());
 
         Mockito.when(productRepository.findByNameContainingIgnoreCase("b"))
-                .thenReturn(productRepositoryMock.values()
+                .thenReturn(dummyRepository.values()
                         .stream()
                         .filter(product -> product.getName().contains("b"))
                         .toList());
@@ -118,6 +118,9 @@ class ProductServiceTest {
         productService.updateById(1l, Product.builder().id(1l).build());
         Mockito.verify(productRepository, Mockito.times(1))
                 .save(Mockito.any());
+        Mockito.verify(productRepository, Mockito.times(1))
+                .findById(1l);
+
     }
 
     @Test
