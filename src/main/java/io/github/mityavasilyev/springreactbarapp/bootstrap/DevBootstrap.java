@@ -8,6 +8,7 @@ import io.github.mityavasilyev.springreactbarapp.product.ProductService;
 import io.github.mityavasilyev.springreactbarapp.tag.TagRepository;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ import java.util.*;
 /**
  * Bootstrap class. Sorta playground
  */
+@Profile("debug")
 @Component
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
