@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>io.github.mityavasilyev</groupId>
-    <artifactId>spring-vertx-react-bar-app</artifactId>
+    <artifactId>spring-react-bar-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>spring-vertx-react-bar-app</name>
     <description>Demo project for Spring Boot</description>
@@ -70,6 +70,16 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
                 </configuration>
             </plugin>
         </plugins>
