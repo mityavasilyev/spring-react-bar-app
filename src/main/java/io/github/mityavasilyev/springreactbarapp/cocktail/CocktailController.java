@@ -5,6 +5,7 @@ import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.extra.Recipe;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
