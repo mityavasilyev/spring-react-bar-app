@@ -4,6 +4,7 @@ import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
 import io.github.mityavasilyev.springreactbarapp.exceptions.NotEnoughProductException;
 import io.github.mityavasilyev.springreactbarapp.exceptions.UnitMismatchException;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,8 +36,10 @@ public class ProductController extends ExceptionController {
     }
 
     @PostMapping
-    public void addNewProduct(@RequestBody ProductDTO productDTO) {
-        productService.addNew(productDTO.parseProduct());
+    public ResponseEntity<Product> addNewProduct(@RequestBody ProductDTO productDTO) {
+        Product product = productDTO.parseProduct();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(productService.addNew(product));
     }
 
     @DeleteMapping(path = "{productId}")

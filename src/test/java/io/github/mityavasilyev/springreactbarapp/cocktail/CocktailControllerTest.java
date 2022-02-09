@@ -2,6 +2,9 @@ package io.github.mityavasilyev.springreactbarapp.cocktail;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.mityavasilyev.springreactbarapp.TestUtils;
+import io.github.mityavasilyev.springreactbarapp.tag.Tag;
+import io.github.mityavasilyev.springreactbarapp.tag.TagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.HashSet;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -24,6 +28,9 @@ class CocktailControllerTest {
 
     @Mock
     CocktailService cocktailService;
+
+    @Mock
+    TagService tagService;
 
     @InjectMocks
     CocktailController cocktailController;
@@ -41,6 +48,7 @@ class CocktailControllerTest {
         mocktail = Cocktail.builder()
                 .id(1L)
                 .name("Test")
+                .tags(new HashSet<>(Arrays.asList(new Tag(1l))))
                 .build();
     }
 
@@ -95,13 +103,17 @@ class CocktailControllerTest {
 
     @Test
     void addNewCocktail() throws Exception {
+        Mockito.when(tagService.getById(Mockito.any()))
+                .thenReturn(new Tag(1l, "Test"));
         mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
-                        .content(toJson(mocktail))
+                        .content(TestUtils.toJson(mocktail))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         Mockito.verify(cocktailService, Mockito.times(1))
                 .addNew(Mockito.any());
+        Mockito.verify(cocktailService)     // Check for proper TagDOT to Tag conversion
+                .addNew(Mockito.argThat((Cocktail cocktail) -> !cocktail.getTags().isEmpty()));
     }
 
     @Test
@@ -114,21 +126,18 @@ class CocktailControllerTest {
 
     @Test
     void updateCocktail() throws Exception {
+        Mockito.when(tagService.getById(Mockito.any()))
+                .thenReturn(new Tag(1l, "Test"));
         Mockito.when(cocktailService.getById(Mockito.any()))
                 .thenReturn(mocktail);
         mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + "/1")
-                        .content(toJson(mocktail))
+                        .content(TestUtils.toJson(mocktail))
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isOk());
         Mockito.verify(cocktailService, Mockito.times(1))
                 .updateById(Mockito.any(), Mockito.any());
-    }
-
-    private String toJson(Object object) {
-        try {
-            return new ObjectMapper().writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException();
-        }
+        Mockito.verify(cocktailService)     // Check for proper TagDOT to Tag conversion
+                .updateById(Mockito.any(), Mockito.argThat(
+                        (Cocktail cocktail) -> !cocktail.getTags().isEmpty()));
     }
 }

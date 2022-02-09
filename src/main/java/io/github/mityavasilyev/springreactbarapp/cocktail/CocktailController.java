@@ -4,6 +4,7 @@ import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
 import io.github.mityavasilyev.springreactbarapp.tag.TagDTO;
 import io.github.mityavasilyev.springreactbarapp.tag.TagService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ public class CocktailController extends ExceptionController {
 
     @PostMapping
     public ResponseEntity<Cocktail> addNewCocktail(@RequestBody CocktailDTO cocktailDTO) {
-        Cocktail cocktail = parseCocktailDTOwithTags(cocktailDTO);
+        Cocktail cocktail = parseCocktailDTOWithTags(cocktailDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(cocktailService.addNew(cocktail));
     }
@@ -61,7 +62,7 @@ public class CocktailController extends ExceptionController {
     @PatchMapping(path = "{cocktailId}")
     public ResponseEntity<Cocktail> updateCocktail(@PathVariable("cocktailId") Long id,
                                                    @RequestBody CocktailDTO cocktailDTO) {
-        Cocktail cocktailPatch = parseCocktailDTOwithTags(cocktailDTO);
+        Cocktail cocktailPatch = parseCocktailDTOWithTags(cocktailDTO);
         Cocktail cocktail = cocktailService.getById(id);
         if (cocktail == null) return ResponseEntity.notFound().build();
 
@@ -76,13 +77,18 @@ public class CocktailController extends ExceptionController {
         return ResponseEntity.ok(cocktail);
     }
 
-    private Cocktail parseCocktailDTOwithTags(CocktailDTO cocktailDTO) {
+    /**
+     * Parses DTO object to entity and retrieves actual tag list.
+     * Needed for preventing injections and relevant data
+     *
+     * @param cocktailDTO DTO object that needs to be parsed
+     * @return parsed entity
+     */
+    private @NotNull Cocktail parseCocktailDTOWithTags(@NotNull CocktailDTO cocktailDTO) {
         Cocktail cocktail = cocktailDTO.parseCocktail();
         Set<Tag> tags = new HashSet<>();
         Set<TagDTO> tagDTOS = cocktailDTO.getTags();
-        if (tagDTOS == null) {
-            tagDTOS = new HashSet<>();
-        } else {
+        if (tagDTOS != null) {
             tagDTOS.forEach(tag -> {
                 tags.add(tagService.getById(tag.parseTagWithId().getId()));
             });
