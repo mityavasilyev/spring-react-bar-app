@@ -4,7 +4,6 @@ import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
 import io.github.mityavasilyev.springreactbarapp.exceptions.NotEnoughProductException;
 import io.github.mityavasilyev.springreactbarapp.exceptions.UnitMismatchException;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
-import io.github.mityavasilyev.springreactbarapp.extra.Unit;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +35,8 @@ public class ProductController extends ExceptionController {
     }
 
     @PostMapping
-    public void addNewProduct(@RequestBody ProductModel productModel) {
-        productService.addNew(parseProduct(productModel));
+    public void addNewProduct(@RequestBody ProductDTO productDTO) {
+        productService.addNew(productDTO.parseProduct());
     }
 
     @DeleteMapping(path = "{productId}")
@@ -48,8 +47,8 @@ public class ProductController extends ExceptionController {
     // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable("productId") Long id,
-                                                 @RequestBody ProductModel productModel) {
-        Product productPatch = parseProduct(productModel);
+                                                 @RequestBody ProductDTO productDTO) {
+        Product productPatch = productDTO.parseProduct();
         Product product = productService.getById(id);
         if (product == null) return ResponseEntity.notFound().build();
 
@@ -75,29 +74,5 @@ public class ProductController extends ExceptionController {
         List<Product> products = productService.consumeIngredients(ingredients);
         return ResponseEntity.ok(products);
 
-    }
-
-    /**
-     * Security feature. Parses model to entity. Prevents from injection and misuse of new/update methods
-     *
-     * @param productModel model that needs to parsed
-     * @return parsed entity
-     */
-    private Product parseProduct(ProductModel productModel) {
-        return Product.builder()
-                .id(productModel.id)
-                .name(productModel.name)
-                .description(productModel.description)
-                .amountLeft(productModel.amountLeft)
-                .unit(productModel.unit)
-                .build();
-    }
-
-    class ProductModel {
-        Long id;
-        String name;
-        String description;
-        Double amountLeft;
-        Unit unit;
     }
 }

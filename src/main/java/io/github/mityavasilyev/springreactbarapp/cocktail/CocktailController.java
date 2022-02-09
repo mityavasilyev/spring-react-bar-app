@@ -1,27 +1,28 @@
 package io.github.mityavasilyev.springreactbarapp.cocktail;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
-import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
-import io.github.mityavasilyev.springreactbarapp.extra.Recipe;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.github.mityavasilyev.springreactbarapp.tag.TagDTO;
+import io.github.mityavasilyev.springreactbarapp.tag.TagService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @RestController
 @RequestMapping(path = "api/cocktails")
 public class CocktailController extends ExceptionController {
+
     private final CocktailService cocktailService;
 
-    public CocktailController(CocktailService cocktailService) {
+    private final TagService tagService;
+
+    public CocktailController(CocktailService cocktailService, TagService tagService) {
         this.cocktailService = cocktailService;
+        this.tagService = tagService;
     }
 
     @GetMapping
@@ -45,9 +46,10 @@ public class CocktailController extends ExceptionController {
     }
 
     @PostMapping
-    public ResponseEntity addNewCocktail(@RequestBody CocktailDTO cocktailDTO) {
+    public ResponseEntity<Cocktail> addNewCocktail(@RequestBody CocktailDTO cocktailDTO) {
+        Cocktail cocktail = parseCocktailDTOwithTags(cocktailDTO);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(cocktailService.addNew(cocktailDTO.parseCocktail()));
+                .body(cocktailService.addNew(cocktail));
     }
 
     @DeleteMapping(path = "{cocktailId}")
@@ -59,7 +61,7 @@ public class CocktailController extends ExceptionController {
     @PatchMapping(path = "{cocktailId}")
     public ResponseEntity<Cocktail> updateCocktail(@PathVariable("cocktailId") Long id,
                                                    @RequestBody CocktailDTO cocktailDTO) {
-        Cocktail cocktailPatch = cocktailDTO.parseCocktail();
+        Cocktail cocktailPatch = parseCocktailDTOwithTags(cocktailDTO);
         Cocktail cocktail = cocktailService.getById(id);
         if (cocktail == null) return ResponseEntity.notFound().build();
 
@@ -72,5 +74,20 @@ public class CocktailController extends ExceptionController {
         cocktail = cocktailService.updateById(id, cocktail);
 
         return ResponseEntity.ok(cocktail);
+    }
+
+    private Cocktail parseCocktailDTOwithTags(CocktailDTO cocktailDTO) {
+        Cocktail cocktail = cocktailDTO.parseCocktail();
+        Set<Tag> tags = new HashSet<>();
+        Set<TagDTO> tagDTOS = cocktailDTO.getTags();
+        if (tagDTOS == null) {
+            tagDTOS = new HashSet<>();
+        } else {
+            tagDTOS.forEach(tag -> {
+                tags.add(tagService.getById(tag.parseTagWithId().getId()));
+            });
+        }
+        cocktail.setTags(tags);
+        return cocktail;
     }
 }
