@@ -4,8 +4,12 @@ import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.extra.Recipe;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,8 +45,9 @@ public class CocktailController extends ExceptionController {
     }
 
     @PostMapping
-    public void addNewCocktail(@RequestBody CocktailModel cocktailModel) {
-        cocktailService.addNew(parseCocktail(cocktailModel));
+    public ResponseEntity addNewCocktail(@RequestBody CocktailDTO cocktailDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(cocktailService.addNew(cocktailDTO.parseCocktail()));
     }
 
     @DeleteMapping(path = "{cocktailId}")
@@ -53,8 +58,8 @@ public class CocktailController extends ExceptionController {
     // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{cocktailId}")
     public ResponseEntity<Cocktail> updateCocktail(@PathVariable("cocktailId") Long id,
-                                                   @RequestBody CocktailModel cocktailModel) {
-        Cocktail cocktailPatch = parseCocktail(cocktailModel);
+                                                   @RequestBody CocktailDTO cocktailDTO) {
+        Cocktail cocktailPatch = cocktailDTO.parseCocktail();
         Cocktail cocktail = cocktailService.getById(id);
         if (cocktail == null) return ResponseEntity.notFound().build();
 
@@ -67,33 +72,5 @@ public class CocktailController extends ExceptionController {
         cocktail = cocktailService.updateById(id, cocktail);
 
         return ResponseEntity.ok(cocktail);
-    }
-
-    /**
-     * Security feature. Parses model to entity. Prevents from injection and misuse of new/update methods
-     *
-     * @param cocktailModel model that needs to parsed
-     * @return parsed entity
-     */
-    private Cocktail parseCocktail(CocktailModel cocktailModel) {
-        return Cocktail.builder()
-                .id(cocktailModel.id)
-                .name(cocktailModel.name)
-                .description(cocktailModel.description)
-                .tags(cocktailModel.tags)
-                .ingredients(cocktailModel.ingredients)
-                .recipe(cocktailModel.recipe)
-                .note(cocktailModel.note)
-                .build();
-    }
-
-    class CocktailModel {
-        Long id;
-        String name;
-        String description;
-        Set<Tag> tags;
-        Set<Ingredient> ingredients;
-        Recipe recipe;
-        String note;
     }
 }
