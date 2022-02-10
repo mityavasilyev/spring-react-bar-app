@@ -90,6 +90,16 @@ class CocktailControllerTest {
     }
 
     @Test
+    void getAllCocktailsByTagId_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/tagId/-20"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/tagId/0"))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(cocktailService, Mockito.times(0))
+                .getAllByTagId(Mockito.any());
+    }
+
+    @Test
     void getCocktailById() throws Exception {
         Mockito.when(cocktailService.getById(1L))
                 .thenReturn(mocktail);
@@ -98,6 +108,16 @@ class CocktailControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L));
         Mockito.verify(cocktailService, Mockito.times(1))
+                .getById(Mockito.any());
+    }
+
+    @Test
+    void getCocktailById_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/-20"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/0"))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(cocktailService, Mockito.times(0))
                 .getById(Mockito.any());
     }
 
@@ -125,6 +145,16 @@ class CocktailControllerTest {
     }
 
     @Test
+    void deleteCocktail_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/-20"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/0"))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(cocktailService, Mockito.times(0))
+                .deleteById(Mockito.any());
+    }
+
+    @Test
     void updateCocktail() throws Exception {
         Mockito.when(tagService.getById(Mockito.any()))
                 .thenReturn(new Tag(1l, "Test"));
@@ -139,5 +169,19 @@ class CocktailControllerTest {
         Mockito.verify(cocktailService)     // Check for proper TagDOT to Tag conversion
                 .updateById(Mockito.any(), Mockito.argThat(
                         (Cocktail cocktail) -> !cocktail.getTags().isEmpty()));
+    }
+
+    @Test
+    void updateCocktail_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + "/-20")
+                .content(TestUtils.toJson(mocktail))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + "/0")
+                        .content(TestUtils.toJson(mocktail))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(cocktailService, Mockito.times(0))
+                .updateById(Mockito.any(), Mockito.any());
     }
 }

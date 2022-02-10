@@ -89,6 +89,16 @@ class ProductControllerTest {
     }
 
     @Test
+    void getProductById_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/-20"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/0"))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(productService, Mockito.times(0))
+                .getById(Mockito.any());
+    }
+
+    @Test
     void addNewProduct() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post(BASE_URL)
                         .content(TestUtils.toJson(mockProduct))
@@ -108,6 +118,16 @@ class ProductControllerTest {
     }
 
     @Test
+    void deleteCocktail_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/-20"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/0"))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(productService, Mockito.times(0))
+                .deleteById(Mockito.any());
+    }
+
+    @Test
     void updateProduct() throws Exception {
         Mockito.when(productService.getById(Mockito.any()))
                 .thenReturn(mockProduct);
@@ -116,6 +136,20 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         Mockito.verify(productService, Mockito.times(1))
+                .updateById(Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    void updateProduct_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + "/-20")
+                        .content(TestUtils.toJson(mockProduct))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + "/0")
+                        .content(TestUtils.toJson(mockProduct))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(productService, Mockito.times(0))
                 .updateById(Mockito.any(), Mockito.any());
     }
 
