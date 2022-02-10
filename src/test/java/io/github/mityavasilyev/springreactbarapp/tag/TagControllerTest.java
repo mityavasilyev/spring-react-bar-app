@@ -67,6 +67,16 @@ class TagControllerTest {
     }
 
     @Test
+    void getTagById_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/-20"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.get(BASE_URL + "/0"))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(tagService, Mockito.times(0))
+                .getById(Mockito.any());
+    }
+
+    @Test
     void getAllTagsByName() throws Exception {
         Mockito.when(tagService.getAllByName("test"))
                 .thenReturn(Arrays.asList(mockTag));
@@ -117,6 +127,20 @@ class TagControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         Mockito.verify(tagService, Mockito.times(1))
+                .updateById(Mockito.any(), Mockito.any());
+    }
+
+    @Test
+    void updateCocktail_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + "/-20")
+                        .content(TestUtils.toJson(mockTag))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.patch(BASE_URL + "/0")
+                        .content(TestUtils.toJson(mockTag))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(tagService, Mockito.times(0))
                 .updateById(Mockito.any(), Mockito.any());
     }
 }
