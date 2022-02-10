@@ -1,5 +1,8 @@
 package io.github.mityavasilyev.springreactbarapp.product;
 
+import io.github.mityavasilyev.springreactbarapp.exceptions.NotEnoughProductException;
+import io.github.mityavasilyev.springreactbarapp.exceptions.UnitMismatchException;
+import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.extra.Unit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,8 +16,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Profile("test")
 @ExtendWith(MockitoExtension.class)
@@ -101,7 +103,14 @@ class ProductServiceTest {
         Mockito.when(productRepository.save(Mockito.any())).thenReturn(product);
         Product returnedProduct = productService.addNew(product);
         assertEquals(product, returnedProduct);
-        Mockito.verify(productRepository).save(Mockito.any());
+
+        // conversion check
+        Mockito.verify(productRepository)
+                .save(Mockito.argThat(
+                        (Product argTestProduct) -> argTestProduct.getAmountLeft().equals((double) 20 * 30)));
+
+        Mockito.verify(productRepository, Mockito.times(1))
+                .save(Mockito.any());
     }
 
     @Test
@@ -120,7 +129,63 @@ class ProductServiceTest {
                 .save(Mockito.any());
         Mockito.verify(productRepository, Mockito.times(1))
                 .findById(1l);
-
     }
 
+    @Test
+    void consumeIngredients() throws UnitMismatchException, NotEnoughProductException {
+        Product dummyProduct = dummyRepository.get(1l);
+        Double originalAmountLeft = (dummyProduct.getAmountLeft() * 1000);  // mocking automatic conversion on save
+        Ingredient ingredient = Ingredient.builder()
+                .id(1l)
+                .amount(1D)
+                .unit(Unit.OUNCE)
+                .sourceProduct(dummyProduct)
+                .build();
+
+        Mockito.when(productRepository.findById(1l))
+                .thenReturn(Optional.ofNullable(dummyProduct));
+
+        List<Product> returnedProducts = productService.consumeIngredients(Arrays.asList(ingredient));
+
+        assertEquals(originalAmountLeft - 30, returnedProducts.get(0).getAmountLeft());
+
+        Mockito.verify(productRepository, Mockito.times(1))
+                .findById(Mockito.any());
+    }
+
+    @Test
+    void consumeIngredients_unitMismatch() {
+        Product dummyProduct = dummyRepository.get(2l);
+        Ingredient ingredient = Ingredient.builder()
+                .id(1l)
+                .amount(1D)
+                .unit(Unit.OUNCE)
+                .sourceProduct(dummyProduct)
+                .build();
+
+        Mockito.when(productRepository.findById(2l))
+                .thenReturn(Optional.ofNullable(dummyProduct));
+
+        assertThrows(UnitMismatchException.class,
+                () -> productService.consumeIngredients(Arrays.asList(ingredient)),
+                "Expected to throw UnitMismatchException due to different units");
+    }
+
+    @Test
+    void consumeIngredients_notEnoughProduct() {
+        Product dummyProduct = dummyRepository.get(2l);
+        Ingredient ingredient = Ingredient.builder()
+                .id(1l)
+                .amount(40D)
+                .unit(Unit.GRAM)
+                .sourceProduct(dummyProduct)
+                .build();
+
+        Mockito.when(productRepository.findById(2l))
+                .thenReturn(Optional.ofNullable(dummyProduct));
+
+        assertThrows(NotEnoughProductException.class,
+                () -> productService.consumeIngredients(Arrays.asList(ingredient)),
+                "Expected to throw NotEnoughProductException due to lack of product to consume");
+    }
 }
