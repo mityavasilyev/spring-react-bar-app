@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.tag;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +27,15 @@ public class TagController {
     }
 
     @GetMapping("/name/{name}")
-    public List<Tag> getAllTagsById(@PathVariable("name") String name) {
+    public List<Tag> getAllTagsByName(@PathVariable("name") String name) {
         return tagService.getAllByName(name);
     }
 
     @PostMapping
-    public void addNewTag(@RequestBody TagModel tagModel) {
-        tagService.addNew(parseTag(tagModel));
+    public ResponseEntity<Tag> addNewTag(@RequestBody TagDTO tagDTO) {
+        Tag tag = tagDTO.parseTagWithName();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(tagService.addNew(tag));
     }
 
     @DeleteMapping(path = "{tagId}")
@@ -43,8 +46,8 @@ public class TagController {
     // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{tagId}")
     public ResponseEntity<Tag> updateTag(@PathVariable("tagId") Long id,
-                                         @RequestBody TagModel tagModel) {
-        Tag tagPatch = parseTag(tagModel);
+                                         @RequestBody TagDTO tagDTO) {
+        Tag tagPatch = tagDTO.parseTagWithName();
         Tag tag = tagService.getById(id);
         if (tag == null) return ResponseEntity.notFound().build();
 
@@ -52,20 +55,5 @@ public class TagController {
         tag = tagService.updateById(id, tag);
 
         return ResponseEntity.ok(tag);
-    }
-
-    /**
-     * Security feature. Parses model to entity. Prevents from injection and misuse of new/update methods
-     *
-     * @param tagModel model that needs to parsed
-     * @return parsed entity
-     */
-    private Tag parseTag(TagModel tagModel) {
-        return new Tag(tagModel.id, tagModel.name);
-    }
-
-    class TagModel {
-        Long id;
-        String name;
     }
 }

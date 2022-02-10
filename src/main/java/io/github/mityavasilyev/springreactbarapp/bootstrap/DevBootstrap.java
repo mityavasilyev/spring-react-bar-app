@@ -3,6 +3,7 @@ package io.github.mityavasilyev.springreactbarapp.bootstrap;
 import io.github.mityavasilyev.springreactbarapp.cocktail.Cocktail;
 import io.github.mityavasilyev.springreactbarapp.extra.*;
 import io.github.mityavasilyev.springreactbarapp.cocktail.CocktailRepository;
+import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.product.Product;
 import io.github.mityavasilyev.springreactbarapp.product.ProductService;
 import io.github.mityavasilyev.springreactbarapp.tag.TagRepository;
