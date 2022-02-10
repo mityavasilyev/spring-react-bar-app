@@ -101,31 +101,36 @@ public class ProductService {
      * @throws NotEnoughProductException if there's not enough product to consume
      * @throws UnitMismatchException     if there's unit mismatch between product and ingredient
      */
-    @Transactional(rollbackFor = {NotEnoughProductException.class})
+    @Transactional(rollbackFor = {NotEnoughProductException.class, UnitMismatchException.class})
     public List<Product> consumeIngredients(List<Ingredient> consumables)
             throws NotEnoughProductException, UnitMismatchException {
         List<Product> affectedProducts = new ArrayList<>();
         for (Ingredient ingredient : consumables) {
-            affectedProducts.add(consumeOneIngredient(ingredient.getSourceProduct().getId(), ingredient));
+            affectedProducts.add(
+                    consumeOneIngredient(
+                            ingredient.getSourceProduct().getId(),
+                            ingredient.getAmount(),
+                            ingredient.getUnit()
+                    ));
         }
         return affectedProducts;
     }
 
     /**
-     * Consumes one product with provided ingredient
+     * Consumes one product with provided ingredient amount and unit
      *
      * @param productId  Source product id
-     * @param ingredient Ingredient to consume
+     * @param ingredientAmount amount of ingredient to consume
+     * @param ingredientUnit unit of ingredient
      * @return Product after consumption
-     * @throws NotEnoughProductException
-     * @throws UnitMismatchException
+     * @throws NotEnoughProductException not enough product for consumption
+     * @throws UnitMismatchException ingredient unit and source product unit don't match
      */
-    private Product consumeOneIngredient(Long productId, Ingredient ingredient)
+    private Product consumeOneIngredient(Long productId, Double ingredientAmount, Unit ingredientUnit)
             throws NotEnoughProductException, UnitMismatchException {
-        // TODO: 06.02.2022 Stop providing ingredient. Use more generic argument instead
         Product consumable = getById(productId);
         AmountUnit productAmountUnit = standardizeUnit(consumable.getAmountLeft(), consumable.getUnit());
-        AmountUnit ingredientAmountUnit = standardizeUnit(ingredient.getAmount(), ingredient.getUnit());
+        AmountUnit ingredientAmountUnit = standardizeUnit(ingredientAmount, ingredientUnit);
         if (!productAmountUnit.unit().equals(ingredientAmountUnit.unit()))
             throw new UnitMismatchException(
                     String.format(
@@ -143,8 +148,8 @@ public class ProductService {
         } else {
             throw new NotEnoughProductException(
                     String.format("Can't consume %s %s of %s (available: %s %s)",
-                            ingredient.getAmount().toString(),
-                            ingredient.getUnit().toString(),
+                            ingredientAmount.toString(),
+                            ingredientUnit.toString(),
                             consumable.getName(),
                             consumable.getAmountLeft().toString(),
                             consumable.getUnit()
