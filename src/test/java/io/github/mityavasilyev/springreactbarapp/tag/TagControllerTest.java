@@ -99,6 +99,16 @@ class TagControllerTest {
     }
 
     @Test
+    void deleteTag_InvalidId() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/-20"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(MockMvcRequestBuilders.delete(BASE_URL + "/0"))
+                .andExpect(status().isBadRequest());
+        Mockito.verify(tagService, Mockito.times(0))
+                .deleteById(Mockito.any());
+    }
+
+    @Test
     void updateTag() throws Exception {
         Mockito.when(tagService.getById(Mockito.any()))
                 .thenReturn(mockTag);
