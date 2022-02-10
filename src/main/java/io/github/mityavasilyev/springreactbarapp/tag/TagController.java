@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.tag;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,13 +27,15 @@ public class TagController {
     }
 
     @GetMapping("/name/{name}")
-    public List<Tag> getAllTagsById(@PathVariable("name") String name) {
+    public List<Tag> getAllTagsByName(@PathVariable("name") String name) {
         return tagService.getAllByName(name);
     }
 
     @PostMapping
-    public void addNewTag(@RequestBody TagDTO tagDTO) {
-        tagService.addNew(tagDTO.parseTagWithName());
+    public ResponseEntity<Tag> addNewTag(@RequestBody TagDTO tagDTO) {
+        Tag tag = tagDTO.parseTagWithName();
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(tagService.addNew(tag));
     }
 
     @DeleteMapping(path = "{tagId}")
