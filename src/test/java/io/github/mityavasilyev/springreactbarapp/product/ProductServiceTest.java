@@ -1,6 +1,5 @@
 package io.github.mityavasilyev.springreactbarapp.product;
 
-import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.extra.Unit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

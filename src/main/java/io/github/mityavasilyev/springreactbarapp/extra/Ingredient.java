@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.extra;
 
+import io.github.mityavasilyev.springreactbarapp.extra.Unit;
 import io.github.mityavasilyev.springreactbarapp.product.Product;
 import lombok.*;
 

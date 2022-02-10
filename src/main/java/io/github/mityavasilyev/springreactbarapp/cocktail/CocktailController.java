@@ -1,22 +1,29 @@
 package io.github.mityavasilyev.springreactbarapp.cocktail;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
-import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
-import io.github.mityavasilyev.springreactbarapp.extra.Recipe;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
+import io.github.mityavasilyev.springreactbarapp.tag.TagDTO;
+import io.github.mityavasilyev.springreactbarapp.tag.TagService;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @RestController
 @RequestMapping(path = "api/cocktails")
 public class CocktailController extends ExceptionController {
+
     private final CocktailService cocktailService;
 
-    public CocktailController(CocktailService cocktailService) {
+    private final TagService tagService;
+
+    public CocktailController(CocktailService cocktailService, TagService tagService) {
         this.cocktailService = cocktailService;
+        this.tagService = tagService;
     }
 
     @GetMapping
@@ -40,8 +47,10 @@ public class CocktailController extends ExceptionController {
     }
 
     @PostMapping
-    public void addNewCocktail(@RequestBody CocktailModel cocktailModel) {
-        cocktailService.addNew(parseCocktail(cocktailModel));
+    public ResponseEntity<Cocktail> addNewCocktail(@RequestBody CocktailDTO cocktailDTO) {
+        Cocktail cocktail = parseCocktailDTOWithTags(cocktailDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(cocktailService.addNew(cocktail));
     }
 
     @DeleteMapping(path = "{cocktailId}")
@@ -52,8 +61,8 @@ public class CocktailController extends ExceptionController {
     // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{cocktailId}")
     public ResponseEntity<Cocktail> updateCocktail(@PathVariable("cocktailId") Long id,
-                                                   @RequestBody CocktailModel cocktailModel) {
-        Cocktail cocktailPatch = parseCocktail(cocktailModel);
+                                                   @RequestBody CocktailDTO cocktailDTO) {
+        Cocktail cocktailPatch = parseCocktailDTOWithTags(cocktailDTO);
         Cocktail cocktail = cocktailService.getById(id);
         if (cocktail == null) return ResponseEntity.notFound().build();
 
@@ -69,30 +78,22 @@ public class CocktailController extends ExceptionController {
     }
 
     /**
-     * Security feature. Parses model to entity. Prevents from injection and misuse of new/update methods
+     * Parses DTO object to entity and retrieves actual tag list.
+     * Needed for preventing injections and relevant data
      *
-     * @param cocktailModel model that needs to parsed
+     * @param cocktailDTO DTO object that needs to be parsed
      * @return parsed entity
      */
-    private Cocktail parseCocktail(CocktailModel cocktailModel) {
-        return Cocktail.builder()
-                .id(cocktailModel.id)
-                .name(cocktailModel.name)
-                .description(cocktailModel.description)
-                .tags(cocktailModel.tags)
-                .ingredients(cocktailModel.ingredients)
-                .recipe(cocktailModel.recipe)
-                .note(cocktailModel.note)
-                .build();
-    }
-
-    class CocktailModel {
-        Long id;
-        String name;
-        String description;
-        Set<Tag> tags;
-        Set<Ingredient> ingredients;
-        Recipe recipe;
-        String note;
+    private @NotNull Cocktail parseCocktailDTOWithTags(@NotNull CocktailDTO cocktailDTO) {
+        Cocktail cocktail = cocktailDTO.parseCocktail();
+        Set<Tag> tags = new HashSet<>();
+        Set<TagDTO> tagDTOS = cocktailDTO.getTags();
+        if (tagDTOS != null) {
+            tagDTOS.forEach(tag -> {
+                tags.add(tagService.getById(tag.parseTagWithId().getId()));
+            });
+        }
+        cocktail.setTags(tags);
+        return cocktail;
     }
 }
