@@ -119,12 +119,12 @@ public class ProductService {
     /**
      * Consumes one product with provided ingredient amount and unit
      *
-     * @param productId  Source product id
+     * @param productId        Source product id
      * @param ingredientAmount amount of ingredient to consume
-     * @param ingredientUnit unit of ingredient
+     * @param ingredientUnit   unit of ingredient
      * @return Product after consumption
      * @throws NotEnoughProductException not enough product for consumption
-     * @throws UnitMismatchException ingredient unit and source product unit don't match
+     * @throws UnitMismatchException     ingredient unit and source product unit don't match
      */
     private Product consumeOneIngredient(Long productId, Double ingredientAmount, Unit ingredientUnit)
             throws NotEnoughProductException, UnitMismatchException {
