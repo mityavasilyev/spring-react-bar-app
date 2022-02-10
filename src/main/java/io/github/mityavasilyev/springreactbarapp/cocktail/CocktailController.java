@@ -1,6 +1,7 @@
 package io.github.mityavasilyev.springreactbarapp.cocktail;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
+import io.github.mityavasilyev.springreactbarapp.exceptions.InvalidIdException;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
 import io.github.mityavasilyev.springreactbarapp.tag.TagDTO;
 import io.github.mityavasilyev.springreactbarapp.tag.TagService;
@@ -27,23 +28,27 @@ public class CocktailController extends ExceptionController {
     }
 
     @GetMapping
-    public List<Cocktail> getAllCocktails() {
-        return cocktailService.getAll();
+    public ResponseEntity<List<Cocktail>> getAllCocktails() {
+        return ResponseEntity.ok(cocktailService.getAll());
     }
 
     @GetMapping(path = "/name/{cocktailName}")
-    public List<Cocktail> getAllCocktailsByName(@PathVariable("cocktailName") String name) {
-        return cocktailService.getAllByName(name);
+    public ResponseEntity<List<Cocktail>> getAllCocktailsByName(@PathVariable("cocktailName") String name) {
+        return ResponseEntity.ok(cocktailService.getAllByName(name));
     }
 
     @GetMapping(path = "/tagId/{tagId}")
-    public List<Cocktail> getAllCocktailsByTagId(@PathVariable("tagId") Long id) {
-        return cocktailService.getAllByTagId(id);
+    public ResponseEntity<List<Cocktail>> getAllCocktailsByTagId(@PathVariable("tagId") Long id)
+            throws InvalidIdException {
+        if (id <= 0) throw new InvalidIdException();
+        return ResponseEntity.ok(cocktailService.getAllByTagId(id));
     }
 
     @GetMapping(path = "{cocktailId}")
-    public Cocktail getCocktailById(@PathVariable("cocktailId") Long id) {
-        return cocktailService.getById(id);
+    public ResponseEntity<Cocktail> getCocktailById(@PathVariable("cocktailId") Long id)
+            throws InvalidIdException {
+        if (id <= 0) throw new InvalidIdException();
+        return ResponseEntity.ok(cocktailService.getById(id));
     }
 
     @PostMapping
@@ -54,14 +59,17 @@ public class CocktailController extends ExceptionController {
     }
 
     @DeleteMapping(path = "{cocktailId}")
-    public void deleteCocktail(@PathVariable("cocktailId") Long id) {
+    public ResponseEntity<Void> deleteCocktail(@PathVariable("cocktailId") Long id)
+            throws InvalidIdException {
+        if (id <= 0) throw new InvalidIdException();
         cocktailService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
-    // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{cocktailId}")
     public ResponseEntity<Cocktail> updateCocktail(@PathVariable("cocktailId") Long id,
-                                                   @RequestBody CocktailDTO cocktailDTO) {
+                                                   @RequestBody CocktailDTO cocktailDTO) throws InvalidIdException {
+        if (id <= 0) throw new InvalidIdException();
         Cocktail cocktailPatch = parseCocktailDTOWithTags(cocktailDTO);
         Cocktail cocktail = cocktailService.getById(id);
         if (cocktail == null) return ResponseEntity.notFound().build();
@@ -89,9 +97,7 @@ public class CocktailController extends ExceptionController {
         Set<Tag> tags = new HashSet<>();
         Set<TagDTO> tagDTOS = cocktailDTO.getTags();
         if (tagDTOS != null) {
-            tagDTOS.forEach(tag -> {
-                tags.add(tagService.getById(tag.parseTagWithId().getId()));
-            });
+            tagDTOS.forEach(tag -> tags.add(tagService.getById(tag.parseTagWithId().getId())));
         }
         cocktail.setTags(tags);
         return cocktail;

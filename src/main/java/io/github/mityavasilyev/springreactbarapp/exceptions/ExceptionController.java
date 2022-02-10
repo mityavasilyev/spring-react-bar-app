@@ -47,6 +47,12 @@ public abstract class ExceptionController {
                     .status(HttpStatus.NOT_ACCEPTABLE)
                     .body(ex.getMessage());
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        if (ex instanceof InvalidIdException) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid Id");
+        }
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }

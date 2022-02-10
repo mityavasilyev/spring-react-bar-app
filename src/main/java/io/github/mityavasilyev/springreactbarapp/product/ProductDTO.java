@@ -16,7 +16,7 @@ public class ProductDTO {
     String description;
     Double amountLeft;
     Unit unit;
-    
+
     /**
      * Security feature. Parses model to entity. Prevents from injection and misuse of new/update methods
      *

@@ -1,6 +1,7 @@
 package io.github.mityavasilyev.springreactbarapp.product;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
+import io.github.mityavasilyev.springreactbarapp.exceptions.InvalidIdException;
 import io.github.mityavasilyev.springreactbarapp.exceptions.NotEnoughProductException;
 import io.github.mityavasilyev.springreactbarapp.exceptions.UnitMismatchException;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
@@ -21,18 +22,19 @@ public class ProductController extends ExceptionController {
     }
 
     @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.getAll();
+    public ResponseEntity<List<Product>> getAllProducts() {
+        return ResponseEntity.ok(productService.getAll());
     }
 
     @GetMapping(path = "/name/{name}")
-    public List<Product> getAllProductsByName(@PathVariable("name") String name) {
-        return productService.getAllByName(name);
+    public ResponseEntity<List<Product>> getAllProductsByName(@PathVariable("name") String name) {
+        return ResponseEntity.ok(productService.getAllByName(name));
     }
 
     @GetMapping(path = "{productId}")
-    public Product getProductById(@PathVariable("productId") Long id) {
-        return productService.getById(id);
+    public ResponseEntity<Product> getProductById(@PathVariable("productId") Long id) throws InvalidIdException {
+        if (id <= 0) throw new InvalidIdException();
+        return ResponseEntity.ok(productService.getById(id));
     }
 
     @PostMapping
@@ -43,14 +45,16 @@ public class ProductController extends ExceptionController {
     }
 
     @DeleteMapping(path = "{productId}")
-    public void deleteProduct(@PathVariable("productId") Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable("productId") Long id) throws InvalidIdException {
+        if (id <= 0) throw new InvalidIdException();
         productService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
-    // TODO: 31.01.2022 Update mappings to use ResponseEntity
     @PatchMapping(path = "{productId}")
     public ResponseEntity<Product> updateProduct(@PathVariable("productId") Long id,
-                                                 @RequestBody ProductDTO productDTO) {
+                                                 @RequestBody ProductDTO productDTO) throws InvalidIdException {
+        if (id <= 0) throw new InvalidIdException();
         Product productPatch = productDTO.parseProduct();
         Product product = productService.getById(id);
         if (product == null) return ResponseEntity.notFound().build();
@@ -71,7 +75,7 @@ public class ProductController extends ExceptionController {
      * @throws NotEnoughProductException handled by ExceptionController. Contains an error message
      */
     @PostMapping(path = "/consume")
-    public ResponseEntity<Object> consumeProducts(@RequestBody List<Ingredient> ingredients)
+    public ResponseEntity<List<Product>> consumeProducts(@RequestBody List<Ingredient> ingredients)
             throws NotEnoughProductException, UnitMismatchException {
 
         List<Product> products = productService.consumeIngredients(ingredients);
