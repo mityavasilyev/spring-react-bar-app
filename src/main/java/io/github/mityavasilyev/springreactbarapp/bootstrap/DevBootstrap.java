@@ -6,7 +6,7 @@ import io.github.mityavasilyev.springreactbarapp.cocktail.CocktailRepository;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.product.Product;
 import io.github.mityavasilyev.springreactbarapp.product.ProductService;
-import io.github.mityavasilyev.springreactbarapp.security.appuser.AppUser;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.AuthService;
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 import io.github.mityavasilyev.springreactbarapp.tag.TagRepository;

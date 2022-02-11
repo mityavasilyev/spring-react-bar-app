@@ -1,6 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
-import io.github.mityavasilyev.springreactbarapp.security.appuser.AppUser;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 
 import java.util.List;
@@ -18,5 +18,7 @@ public interface AuthService {
     Role getRole(Long id);
 
     List<AppUser> getUsers();
+
+    List<Role> getRoles();
 
 }

@@ -20,6 +20,6 @@ public class RoleDTO {
      * @return parsed entity
      */
     public Role parseRole() {
-        return new Role(this.id, this.name);
+        return new Role(null, this.name);
     }
 }

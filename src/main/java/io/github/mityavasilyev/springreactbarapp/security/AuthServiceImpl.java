@@ -1,9 +1,9 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
-import io.github.mityavasilyev.springreactbarapp.security.appuser.AppUser;
-import io.github.mityavasilyev.springreactbarapp.security.appuser.AppUserRepository;
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 import io.github.mityavasilyev.springreactbarapp.security.role.RoleRepository;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,5 +75,11 @@ public class AuthServiceImpl implements AuthService {
     public List<AppUser> getUsers() {
         log.info("Fetching all users");
         return appUserRepository.findAll();
+    }
+
+    @Override
+    public List<Role> getRoles() {
+        log.info("Fetching all roles");
+        return roleRepository.findAll();
     }
 }
