@@ -97,7 +97,7 @@ public class CocktailController extends ExceptionController {
         Set<Tag> tags = new HashSet<>();
         Set<TagDTO> tagDTOS = cocktailDTO.getTags();
         if (tagDTOS != null) {
-            tagDTOS.forEach(tag -> tags.add(tagService.getById(tag.parseTagWithId().getId())));
+            tagDTOS.forEach(tag -> tags.add(tagService.getById(tag.getId())));
         }
         cocktail.setTags(tags);
         return cocktail;

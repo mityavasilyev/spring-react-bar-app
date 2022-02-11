@@ -31,6 +31,7 @@ public class Tag {
     )
     @Column(updatable = false)
     private Long id;
+
     @Column(
             name = "name",
             nullable = false,
