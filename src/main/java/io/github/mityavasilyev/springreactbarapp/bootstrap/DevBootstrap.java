@@ -6,8 +6,12 @@ import io.github.mityavasilyev.springreactbarapp.cocktail.CocktailRepository;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.product.Product;
 import io.github.mityavasilyev.springreactbarapp.product.ProductService;
+import io.github.mityavasilyev.springreactbarapp.security.appuser.AppUser;
+import io.github.mityavasilyev.springreactbarapp.security.AuthService;
+import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 import io.github.mityavasilyev.springreactbarapp.tag.TagRepository;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -20,6 +24,7 @@ import java.util.*;
  */
 @Profile("debug")
 @Component
+@RequiredArgsConstructor
 public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     public static final String RUM = "Rum";
@@ -39,18 +44,40 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
     private final TagRepository tagRepository;
     private final CocktailRepository cocktailRepository;
     private final ProductService productService;
-
-    public DevBootstrap(TagRepository tagRepository,
-                        CocktailRepository cocktailRepository,
-                        ProductService productService) {
-        this.tagRepository = tagRepository;
-        this.cocktailRepository = cocktailRepository;
-        this.productService = productService;
-    }
+    private final AuthService authService;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
 
+
+        // Adding users and roles
+        Role role1 = new Role(1l, "root_user");
+        authService.saveRole(role1);
+        Role role2 = new Role(2l, "regular_user");
+        authService.saveRole(role2);
+        Role role3 = new Role(3l, "moderator_user");
+        authService.saveRole(role3);
+
+        AppUser appUser1 = AppUser.builder()
+                .id(1L)
+                .name("Admin")
+                .username("admin")
+                .password("root")
+                .roles(Arrays.asList(role1, role2))
+                .build();
+        authService.saveUser(appUser1);
+
+        AppUser appUser2 = AppUser.builder()
+                .id(2L)
+                .name("Bob TheDude")
+                .username("bob")
+                .password("bobrules69")
+                .roles(List.of(role2))
+                .build();
+        authService.saveUser(appUser2);
+
+
+        // Adding tags
         List<Tag> tags = new LinkedList<>();
         Tag rumTag = new Tag(RUM);
         tags.add(rumTag);
@@ -62,6 +89,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         tags.add(bitterTag);
         tagRepository.saveAll(Arrays.asList(rumTag, coldTag, sweetTag, bitterTag));
 
+        // Adding products
         List<Product> products = new LinkedList<>();
         Product cola = Product.builder()
                 .name(COCA_COLA)
@@ -84,6 +112,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
         products.add(lemon);
         products.stream().forEach(productService::addNew);
 
+        // Saving cocktails
         Cocktail cocktail1 = Cocktail.builder()
                 .name(CUBA_LIBRE)
                 .description("Taste some of that rum")
