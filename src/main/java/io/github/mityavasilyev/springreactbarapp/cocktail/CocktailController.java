@@ -29,7 +29,8 @@ public class CocktailController extends ExceptionController {
 
     @GetMapping
     public ResponseEntity<List<Cocktail>> getAllCocktails() {
-        return ResponseEntity.ok(cocktailService.getAll());
+//        return ResponseEntity.ok(cocktailService.getAll());
+        return null;
     }
 
     @GetMapping(path = "/name/{cocktailName}")
