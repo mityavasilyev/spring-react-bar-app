@@ -1,15 +1,23 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
+import io.github.mityavasilyev.springreactbarapp.exceptions.DataNotFoundException;
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 import io.github.mityavasilyev.springreactbarapp.security.role.RoleRepository;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +27,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class AuthServiceImpl implements AuthService {
+public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
@@ -81,5 +89,24 @@ public class AuthServiceImpl implements AuthService {
     public List<Role> getRoles() {
         log.info("Fetching all roles");
         return roleRepository.findAll();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        AppUser appUser = appUserRepository.findByUsername(username);
+        if (appUser == null) {
+            log.error("No user with username [{}]", username);
+            throw new UsernameNotFoundException(String.format("No user with such username: %s", username));
+        } else {
+            log.info("Found user with username [{}]", username);
+        }
+
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        appUser.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+
+        return new User(
+                appUser.getUsername(),
+                appUser.getPassword(),
+                authorities);
     }
 }
