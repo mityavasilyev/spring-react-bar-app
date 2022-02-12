@@ -1,4 +1,4 @@
-package io.github.mityavasilyev.springreactbarapp.security.appuser;
+package io.github.mityavasilyev.springreactbarapp.security.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

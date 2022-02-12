@@ -1,4 +1,4 @@
-package io.github.mityavasilyev.springreactbarapp.security.appuser;
+package io.github.mityavasilyev.springreactbarapp.security.user;
 
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 import lombok.AllArgsConstructor;
