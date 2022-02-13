@@ -13,6 +13,8 @@ import javax.persistence.*;
 @Table(name = "roles")
 public class Role {
 
+    public static final String JSON_FIELD_ROLES = "roles";
+
     @Id
     @GeneratedValue(
             strategy = GenerationType.IDENTITY

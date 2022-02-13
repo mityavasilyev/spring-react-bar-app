@@ -18,6 +18,9 @@ import java.util.Collection;
 @Table(name = "app_users")
 public class AppUser {
 
+    public static final String JSON_FIELD_USERNAME = "username";
+    public static final String JSON_FIELD_PASSWORD = "password";
+
     @Id
     @GeneratedValue(
             strategy = GenerationType.IDENTITY
@@ -34,6 +37,7 @@ public class AppUser {
 
     private String password;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
 }
