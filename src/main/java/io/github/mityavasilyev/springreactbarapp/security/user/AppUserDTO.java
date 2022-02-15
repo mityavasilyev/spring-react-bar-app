@@ -1,17 +1,12 @@
 package io.github.mityavasilyev.springreactbarapp.security.user;
 
 import io.github.mityavasilyev.springreactbarapp.security.role.RoleDTO;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
 public class AppUserDTO {
 

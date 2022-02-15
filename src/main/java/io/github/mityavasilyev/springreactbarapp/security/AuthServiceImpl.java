@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -31,10 +32,12 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public AppUser saveUser(AppUser appUser) {
         log.info("Saving user to the database: id[{}] username[{}]", appUser.getId(), appUser.getUsername());
+        appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }
 
@@ -65,6 +68,17 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
             return appUser.get();
         } else {
             throw new ResponseStatusException(NOT_FOUND, "No user with such id");
+        }
+    }
+
+    @Override
+    public AppUser getUser(String username) {
+        log.info("Fetching user by username {}", username);
+        Optional<AppUser> appUser = Optional.ofNullable(appUserRepository.findByUsername(username));
+        if (appUser.isPresent()) {
+            return appUser.get();
+        } else {
+            throw new ResponseStatusException(NOT_FOUND, "No user with such username");
         }
     }
 

@@ -1,7 +1,9 @@
-package io.github.mityavasilyev.springreactbarapp.security;
+package io.github.mityavasilyev.springreactbarapp.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.mityavasilyev.springreactbarapp.security.AuthUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,13 +20,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.github.mityavasilyev.springreactbarapp.security.AuthUtils.ROLES_FIELD;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    // Pass down this value from somewhere
-    public static final String SECRET = "secret";
     private final AuthenticationManager authenticationManager;
 
     public CustomAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -56,13 +61,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         log.info("Successful login attempt with username [{}]", request.getParameter("username"));
 
         User user = (User) authResult.getPrincipal();
-        Algorithm algorithm = Algorithm.HMAC256(SECRET.getBytes(StandardCharsets.UTF_8));
+        Algorithm algorithm = AuthUtils.getEncryptionAlgorithm();
 
         String accessToken = JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + (10 * 60 * 1000)))
                 .withIssuer(request.getRequestURI().toString())
-                .withClaim("roles",
+                .withClaim(ROLES_FIELD,
                         user.getAuthorities().stream()
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList()))
@@ -74,8 +79,14 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURI().toString())
                 .sign(algorithm);
 
-        response.setHeader("access_token", accessToken);
-        response.setHeader("refresh_token", refreshToken);
+        Map<String, String> tokens = new HashMap<>();
+        tokens.put("access_token", accessToken);
+        tokens.put("refresh_token", refreshToken);
+        response.setContentType(APPLICATION_JSON_VALUE);
+        new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+
+//        response.setHeader("access_token", accessToken);
+//        response.setHeader("refresh_token", refreshToken);
     }
 
     // TODO: 12.02.2022 configure login denial

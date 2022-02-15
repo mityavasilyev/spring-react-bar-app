@@ -15,6 +15,8 @@ public interface AuthService {
 
     AppUser getUser(Long id);
 
+    AppUser getUser(String username);
+
     Role getRole(Long id);
 
     List<AppUser> getUsers();
