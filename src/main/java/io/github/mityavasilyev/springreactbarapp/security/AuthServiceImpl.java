@@ -1,13 +1,11 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
-import io.github.mityavasilyev.springreactbarapp.exceptions.DataNotFoundException;
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 import io.github.mityavasilyev.springreactbarapp.security.role.RoleRepository;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

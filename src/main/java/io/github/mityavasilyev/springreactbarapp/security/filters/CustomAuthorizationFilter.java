@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.mityavasilyev.springreactbarapp.security.utils.AuthUtils.ROLES_FIELD;
+import static io.github.mityavasilyev.springreactbarapp.security.role.Role.JSON_FIELD_ROLES;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -57,7 +57,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     DecodedJWT decodedJWT = TokenProvider.verifyToken(authorizationHeader);
 
                     String username = decodedJWT.getSubject();
-                    String[] roles = decodedJWT.getClaim(ROLES_FIELD).asArray(String.class);
+                    String[] roles = decodedJWT.getClaim(JSON_FIELD_ROLES).asArray(String.class);
 
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     stream(roles).forEach(

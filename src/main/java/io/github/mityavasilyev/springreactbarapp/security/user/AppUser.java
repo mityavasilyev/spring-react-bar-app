@@ -37,6 +37,7 @@ public class AppUser {
 
     private String password;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.EAGER)
     private Collection<Role> roles = new ArrayList<>();
 }

@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-import static io.github.mityavasilyev.springreactbarapp.security.utils.AuthUtils.ROLES_FIELD;
+import static io.github.mityavasilyev.springreactbarapp.security.role.Role.JSON_FIELD_ROLES;
 
 @Slf4j
 public class TokenProvider {
@@ -51,7 +51,7 @@ public class TokenProvider {
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + (10 * 60 * 1000)))
                 .withIssuer(issuer)
-                .withClaim(ROLES_FIELD,
+                .withClaim(JSON_FIELD_ROLES,
                         user.getAuthorities().stream()
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList()))
@@ -84,7 +84,7 @@ public class TokenProvider {
                 .withSubject(appUser.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + (10 * 60 * 1000)))
                 .withIssuer(issuer)
-                .withClaim(ROLES_FIELD,
+                .withClaim(JSON_FIELD_ROLES,
                         appUser.getRoles().stream()
                                 .map(Role::getName)
                                 .collect(Collectors.toList()))
