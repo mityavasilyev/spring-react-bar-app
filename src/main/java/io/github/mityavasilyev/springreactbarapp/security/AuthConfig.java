@@ -31,6 +31,12 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
 
     }
 
+    /**
+     * Configures rules by which http server would operate
+     * 
+     * @param http
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();      //thank god this exists...

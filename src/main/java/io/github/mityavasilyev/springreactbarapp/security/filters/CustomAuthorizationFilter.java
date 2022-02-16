@@ -54,16 +54,18 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             if (authorizationHeader != null) {
                 try {
+                    // Decoding jwt from header
                     DecodedJWT decodedJWT = TokenProvider.verifyToken(authorizationHeader);
 
+                    // Collecting user info
                     String username = decodedJWT.getSubject();
                     String[] roles = decodedJWT.getClaim(JSON_FIELD_ROLES).asArray(String.class);
-
                     Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                     stream(roles).forEach(
                             role -> authorities.add(new SimpleGrantedAuthority(role))
                     );
 
+                    // Applying authorities
                     SecurityContextHolder
                             .getContext()
                             .setAuthentication(new UsernamePasswordAuthenticationToken(username, null, authorities));

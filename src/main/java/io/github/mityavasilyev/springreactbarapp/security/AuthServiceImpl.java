@@ -95,7 +95,16 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     @Override
     public List<AppUser> getUsers() {
         log.info("Fetching all users");
-        return appUserRepository.findAll();
+        List<AppUser> appUsers = new ArrayList<>();
+        appUserRepository.findAll().stream().forEach(appUser ->
+                appUsers.add(AppUser.builder()
+                        .id(appUser.getId())
+                        .name(appUser.getName())
+                        .username(appUser.getUsername())
+                        .roles(appUser.getRoles())
+                        .build())
+        );
+        return appUsers;
     }
 
     @Override

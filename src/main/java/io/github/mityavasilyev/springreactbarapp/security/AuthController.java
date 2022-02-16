@@ -1,7 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionUtils;
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
@@ -21,9 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.*;
 
-import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @RestController
@@ -79,33 +76,31 @@ public class AuthController extends ExceptionController {
     public ResponseEntity<Object> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
 
-            log.info("Refresh Token routine triggered");
-            try {
-                DecodedJWT decodedJWT = TokenProvider.verifyToken(authorizationHeader);
-                String refreshToken = decodedJWT.getToken();
+        log.info("Refresh Token routine triggered");
+        try {
+            DecodedJWT decodedJWT = TokenProvider.verifyToken(authorizationHeader);
+            String refreshToken = decodedJWT.getToken();
 
-                String username = decodedJWT.getSubject();
-                String issuer = request.getRequestURI().toString();
-                AppUser appUser = authService.getUser(username);
+            String username = decodedJWT.getSubject();
+            String issuer = request.getRequestURI().toString();
+            AppUser appUser = authService.getUser(username);
 
-                String accessToken = TokenProvider.refreshToken(appUser, issuer);
+            String accessToken = TokenProvider.refreshToken(appUser, issuer);
 
-                Map<String, String> tokens = new HashMap<>();
-                tokens.put(TokenProvider.JSON_FIELD_ACCESS_TOKEN, accessToken);
-                tokens.put(TokenProvider.JSON_FIELD_REFRESH_TOKEN, refreshToken);
-                return ResponseEntity.ok().body(tokens);
-//                response.setContentType(APPLICATION_JSON_VALUE);
-//                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+            Map<String, String> tokens = new HashMap<>();
+            tokens.put(TokenProvider.JSON_FIELD_ACCESS_TOKEN, accessToken);
+            tokens.put(TokenProvider.JSON_FIELD_REFRESH_TOKEN, refreshToken);
+            return ResponseEntity.ok().body(tokens);
 
-            } catch (Exception exception) {
-                log.error("Error while refreshing token: {}", exception.getMessage());
+        } catch (Exception exception) {
+            log.error("Error while refreshing token: {}", exception.getMessage());
 
-                Map<String, String> error = new HashMap<>();
-                error.put(ExceptionUtils.JSON_FIELD_ERROR, String.format("Failed to verify token: %s", exception.getMessage()));
-                return ResponseEntity
-                        .status(HttpStatus.NOT_ACCEPTABLE)
-                        .body(error);
-            }
+            Map<String, String> error = new HashMap<>();
+            error.put(ExceptionUtils.JSON_FIELD_ERROR, String.format("Failed to verify token: %s", exception.getMessage()));
+            return ResponseEntity
+                    .status(HttpStatus.NOT_ACCEPTABLE)
+                    .body(error);
+        }
     }
 
     /**
