@@ -73,8 +73,6 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                 } catch (Exception exception) {
                     log.error("Error during login: {}", exception.getMessage());
 
-                    // Sending error response
-//                    response.setHeader(ExceptionUtils.JSON_FIELD_ERROR, exception.getMessage());
                     response.setStatus(FORBIDDEN.value());
                     Map<String, String> error = new HashMap<>();
                     error.put(ExceptionUtils.JSON_FIELD_ERROR, exception.getMessage());
