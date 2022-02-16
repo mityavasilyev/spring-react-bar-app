@@ -13,10 +13,9 @@ public class SpringReactBarAppApplication {
         SpringApplication.run(SpringReactBarAppApplication.class, args);
     }
 
-    // Figure out where to put this thing
+    // TODO: 16.02.2022 Move this someplace else
     @Bean
-    PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }

@@ -1,11 +1,9 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
+import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionUtils;
 import io.github.mityavasilyev.springreactbarapp.security.role.Role;
 import io.github.mityavasilyev.springreactbarapp.security.role.RoleDTO;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
@@ -13,11 +11,8 @@ import io.github.mityavasilyev.springreactbarapp.security.user.AppUserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -25,9 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static io.github.mityavasilyev.springreactbarapp.security.AuthUtils.ROLES_FIELD;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -83,43 +76,36 @@ public class AuthController extends ExceptionController {
     }
 
     @GetMapping("/refresh")
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Object> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+
             log.info("Refresh Token routine triggered");
             try {
-                String oldRefreshToken = authorizationHeader.substring("Bearer ".length());
-                Algorithm algorithm = AuthUtils.getEncryptionAlgorithm();
-
-                JWTVerifier verifier = JWT.require(algorithm).build();
-                DecodedJWT decodedJWT = verifier.verify(oldRefreshToken);
+                DecodedJWT decodedJWT = TokenProvider.verifyToken(authorizationHeader);
+                String refreshToken = decodedJWT.getToken();
 
                 String username = decodedJWT.getSubject();
+                String issuer = request.getRequestURI().toString();
                 AppUser appUser = authService.getUser(username);
 
-                String accessToken = JWT.create()
-                        .withSubject(appUser.getUsername())
-                        .withExpiresAt(new Date(System.currentTimeMillis() + (10 * 60 * 1000)))
-                        .withIssuer(request.getRequestURI().toString())
-                        .withClaim(ROLES_FIELD,
-                                appUser.getRoles().stream()
-                                        .map(Role::getName)
-                                        .collect(Collectors.toList()))
-                        .sign(algorithm);
+                String accessToken = TokenProvider.refreshToken(appUser, issuer);
 
                 Map<String, String> tokens = new HashMap<>();
-                tokens.put("access_token", accessToken);
-                tokens.put("refresh_token", oldRefreshToken);
-                response.setContentType(APPLICATION_JSON_VALUE);
-                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+                tokens.put(TokenProvider.JSON_FIELD_ACCESS_TOKEN, accessToken);
+                tokens.put(TokenProvider.JSON_FIELD_REFRESH_TOKEN, refreshToken);
+                return ResponseEntity.ok().body(tokens);
+//                response.setContentType(APPLICATION_JSON_VALUE);
+//                new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 
             } catch (Exception exception) {
                 log.error("Error while refreshing token: {}", exception.getMessage());
-                // TODO: 15.02.2022 Handle invalid refresh token
+
+                Map<String, String> error = new HashMap<>();
+                error.put(ExceptionUtils.JSON_FIELD_ERROR, String.format("Failed to verify token: %s", exception.getMessage()));
+                return ResponseEntity
+                        .status(HttpStatus.NOT_ACCEPTABLE)
+                        .body(error);
             }
-        } else {
-            throw new RuntimeException("Refresh token is missing");
-        }
     }
 
     /**

@@ -1,12 +1,9 @@
 package io.github.mityavasilyev.springreactbarapp.security.filters;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.mityavasilyev.springreactbarapp.exceptions.DataNotFoundException;
-import io.github.mityavasilyev.springreactbarapp.security.AuthUtils;
+import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionUtils;
+import io.github.mityavasilyev.springreactbarapp.security.TokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.github.mityavasilyev.springreactbarapp.security.AuthUtils.ROLES_FIELD;
+import static io.github.mityavasilyev.springreactbarapp.security.utils.AuthUtils.ROLES_FIELD;
 import static java.util.Arrays.stream;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -49,17 +46,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
-        if (request.getServletPath().equals("/login/**") || request.getServletPath().equals("/api/auth/refresh")) {
+        if (request.getServletPath().equals("/login") || request.getServletPath().equals("/api/auth/refresh")) {
+            log.info("Processing unauthenticated request");
             filterChain.doFilter(request, response);
         } else {
+            log.info("Processing authenticated request");
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            if (authorizationHeader != null) {
                 try {
-                    String token = authorizationHeader.substring("Bearer ".length());
-                    Algorithm algorithm = AuthUtils.getEncryptionAlgorithm();
-
-                    JWTVerifier verifier = JWT.require(algorithm).build();
-                    DecodedJWT decodedJWT = verifier.verify(token);
+                    DecodedJWT decodedJWT = TokenProvider.verifyToken(authorizationHeader);
 
                     String username = decodedJWT.getSubject();
                     String[] roles = decodedJWT.getClaim(ROLES_FIELD).asArray(String.class);
@@ -69,20 +64,22 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                             role -> authorities.add(new SimpleGrantedAuthority(role))
                     );
 
-                    UsernamePasswordAuthenticationToken authenticationToken =
-                            new UsernamePasswordAuthenticationToken(username, null, authorities);
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    SecurityContextHolder
+                            .getContext()
+                            .setAuthentication(new UsernamePasswordAuthenticationToken(username, null, authorities));
+
                     filterChain.doFilter(request, response);
+
                 } catch (Exception exception) {
                     log.error("Error during login: {}", exception.getMessage());
-                    response.setHeader("error", exception.getMessage());
+
+                    // Sending error response
+//                    response.setHeader(ExceptionUtils.JSON_FIELD_ERROR, exception.getMessage());
                     response.setStatus(FORBIDDEN.value());
-//                    response.sendError(FORBIDDEN.value());
                     Map<String, String> error = new HashMap<>();
-                    error.put("error_message", exception.getMessage());
+                    error.put(ExceptionUtils.JSON_FIELD_ERROR, exception.getMessage());
                     response.setContentType(APPLICATION_JSON_VALUE);
                     new ObjectMapper().writeValue(response.getOutputStream(), error);
-
                 }
             } else {
                 filterChain.doFilter(request, response);

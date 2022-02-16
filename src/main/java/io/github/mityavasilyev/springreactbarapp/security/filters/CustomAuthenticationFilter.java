@@ -1,15 +1,14 @@
 package io.github.mityavasilyev.springreactbarapp.security.filters;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.mityavasilyev.springreactbarapp.security.AuthUtils;
+import io.github.mityavasilyev.springreactbarapp.security.TokenProvider;
+import io.github.mityavasilyev.springreactbarapp.security.utils.AccessRefreshTokens;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -18,13 +17,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static io.github.mityavasilyev.springreactbarapp.security.AuthUtils.ROLES_FIELD;
+import static io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionUtils.JSON_FIELD_ERROR;
+import static io.github.mityavasilyev.springreactbarapp.security.user.AppUser.JSON_FIELD_PASSWORD;
+import static io.github.mityavasilyev.springreactbarapp.security.user.AppUser.JSON_FIELD_USERNAME;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
@@ -42,8 +40,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             HttpServletResponse response)
             throws AuthenticationException {
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        String username = request.getParameter(JSON_FIELD_USERNAME);
+        String password = request.getParameter(JSON_FIELD_PASSWORD);
+
         log.info("New login attempt with username/password [{}/{}]", username, password);
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -58,35 +57,22 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             HttpServletResponse response,
             FilterChain chain,
             Authentication authResult) throws IOException, ServletException {
-        log.info("Successful login attempt with username [{}]", request.getParameter("username"));
 
+        log.info("Successful login attempt with username [{}]", request.getParameter(JSON_FIELD_USERNAME));
+
+        // Getting user info
         User user = (User) authResult.getPrincipal();
-        Algorithm algorithm = AuthUtils.getEncryptionAlgorithm();
+        String issuer = request.getRequestURI().toString();
 
-        String accessToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + (10 * 60 * 1000)))
-                .withIssuer(request.getRequestURI().toString())
-                .withClaim(ROLES_FIELD,
-                        user.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList()))
-                .sign(algorithm);
+        // Generating tokens
+        AccessRefreshTokens accessRefreshTokens = TokenProvider.generateTokens(user, issuer);
 
-        String refreshToken = JWT.create()
-                .withSubject(user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + (30 * 60 * 1000)))
-                .withIssuer(request.getRequestURI().toString())
-                .sign(algorithm);
-
+        // Returning generated tokens
         Map<String, String> tokens = new HashMap<>();
-        tokens.put("access_token", accessToken);
-        tokens.put("refresh_token", refreshToken);
+        tokens.put(TokenProvider.JSON_FIELD_ACCESS_TOKEN, accessRefreshTokens.accessToken());
+        tokens.put(TokenProvider.JSON_FIELD_REFRESH_TOKEN, accessRefreshTokens.refreshToken());
         response.setContentType(APPLICATION_JSON_VALUE);
         new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-
-//        response.setHeader("access_token", accessToken);
-//        response.setHeader("refresh_token", refreshToken);
     }
 
     // TODO: 12.02.2022 configure login denial
@@ -95,8 +81,15 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
             HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException failed) throws IOException, ServletException {
-        log.info("Failed login attempt with username [{}]", request.getParameter("username"));
+        log.info("Failed login attempt with username [{}]", request.getParameter(JSON_FIELD_USERNAME));
 
-        super.unsuccessfulAuthentication(request, response, failed);
+        Map<String, String> denial = new HashMap<>();
+        denial.put(JSON_FIELD_USERNAME, request.getParameter(JSON_FIELD_USERNAME));
+        denial.put(JSON_FIELD_ERROR, "Invalid password");
+        response.setContentType(APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+        new ObjectMapper().writeValue(response.getOutputStream(), denial);
+
+//        super.unsuccessfulAuthentication(request, response, failed);
     }
 }
