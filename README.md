@@ -14,3 +14,7 @@
     Web App that aims to assist in managing your own bar. Keep track of spirits available 
 and manage cocktail recipes   
 </p>
+
+### Tech
+Framework: Spring Boot
+Security: Spring Security + auth0/JWT (https://github.com/auth0/java-jwt)
