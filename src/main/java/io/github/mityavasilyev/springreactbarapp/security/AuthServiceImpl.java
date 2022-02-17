@@ -113,11 +113,18 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         return roleRepository.findAll();
     }
 
+    /**
+     * Binds Spring Security users to AppUsers
+     *
+     * @param username to search for in db
+     * @return User details
+     * @throws UsernameNotFoundException no user with such username was found
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser appUser = appUserRepository.findByUsername(username);
         if (appUser == null) {
-            log.error("No user with username [{}]", username);
+            log.error("No user with username [{}] was found", username);
             throw new UsernameNotFoundException(String.format("No user with such username: %s", username));
         } else {
             log.info("Found user with username [{}]", username);

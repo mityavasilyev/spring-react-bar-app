@@ -89,7 +89,5 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         response.setContentType(APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.FORBIDDEN.value());
         new ObjectMapper().writeValue(response.getOutputStream(), denial);
-
-//        super.unsuccessfulAuthentication(request, response, failed);
     }
 }

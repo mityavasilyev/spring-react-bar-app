@@ -23,6 +23,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final CustomAuthorizationFilter customAuthorizationFilter;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -33,7 +34,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Configures rules by which http server would operate
-     * 
+     *
      * @param http
      * @throws Exception
      */
@@ -43,19 +44,12 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
-                .antMatchers("/login/**", "/api/auth/refresh/**")
-                .permitAll();
-
-        http.authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/auth/**")
-                .hasAuthority("root_user");
-
-        http.authorizeRequests()
-                .anyRequest()
-                .authenticated();
+                .antMatchers("/login/**", "/api/auth/refresh/**").permitAll()
+                .antMatchers("/api/auth/**").hasAuthority("root_user")
+                .anyRequest().authenticated();
 
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(customAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean
