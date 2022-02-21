@@ -1,15 +1,11 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
-import io.github.mityavasilyev.springreactbarapp.security.role.Role;
-import io.github.mityavasilyev.springreactbarapp.security.role.RoleRepository;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRepository;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,10 +23,9 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class AuthServiceImpl implements AuthService, UserDetailsService {
+public class AuthServiceImpl implements AuthService {
 
     private final AppUserRepository appUserRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -38,25 +33,6 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         log.info("Saving user to the database: id[{}] username[{}]", appUser.getId(), appUser.getUsername());
         appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
-    }
-
-    @Override
-    public Role saveRole(Role role) {
-        log.info("Saving role to the database: id[{}] name[{}]", role.getId(), role.getName());
-        return roleRepository.save(role);
-    }
-
-    @Override
-    public void assignRoleToUser(String username, Long roleId) {
-        log.info("Assigning role with id {} to user {}", username, roleId.toString());
-        AppUser user = appUserRepository.findByUsername(username);
-        if (user == null) throw new ResponseStatusException(NOT_FOUND, "No user with such id");
-        Optional<Role> role = roleRepository.findById(roleId);
-        if (role.isPresent()) {
-            user.getRoles().add(role.get());
-        } else {
-            throw new ResponseStatusException(NOT_FOUND, "No role with such id");
-        }
     }
 
     @Override
@@ -73,7 +49,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     @Override
     public AppUser getUser(String username) {
         log.info("Fetching user by username {}", username);
-        Optional<AppUser> appUser = Optional.ofNullable(appUserRepository.findByUsername(username));
+        Optional<AppUser> appUser = appUserRepository.findByUsername(username);
         if (appUser.isPresent()) {
             return appUser.get();
         } else {
@@ -82,35 +58,16 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     }
 
     @Override
-    public Role getRole(Long id) {
-        log.info("Fetching role by id {}", id.toString());
-        Optional<Role> role = roleRepository.findById(id);
-        if (role.isPresent()) {
-            return role.get();
-        } else {
-            throw new ResponseStatusException(NOT_FOUND, "No role with such id");
-        }
-    }
-
-    @Override
     public List<AppUser> getUsers() {
         log.info("Fetching all users");
-        List<AppUser> appUsers = new ArrayList<>();
-        appUserRepository.findAll().stream().forEach(appUser ->
-                appUsers.add(AppUser.builder()
-                        .id(appUser.getId())
-                        .name(appUser.getName())
-                        .username(appUser.getUsername())
-                        .roles(appUser.getRoles())
-                        .build())
-        );
-        return appUsers;
+        return new ArrayList<>(appUserRepository.findAll());
     }
 
     @Override
-    public List<Role> getRoles() {
+    public List<AppUserRole> getRoles() {
         log.info("Fetching all roles");
-        return roleRepository.findAll();
+        List<AppUserRole> appUserRoles = Arrays.stream(AppUserRole.values()).toList();
+        return appUserRoles;
     }
 
     /**
@@ -122,20 +79,11 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        AppUser appUser = appUserRepository.findByUsername(username);
-        if (appUser == null) {
-            log.error("No user with username [{}] was found", username);
-            throw new UsernameNotFoundException(String.format("No user with such username: %s", username));
-        } else {
-            log.info("Found user with username [{}]", username);
-        }
+        return appUserRepository
+                .findByUsername(username)
+                .orElseThrow(
+                        () -> new UsernameNotFoundException(String.format("No such user: %s", username))
+                );
 
-        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        appUser.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
-
-        return new User(
-                appUser.getUsername(),
-                appUser.getPassword(),
-                authorities);
     }
 }

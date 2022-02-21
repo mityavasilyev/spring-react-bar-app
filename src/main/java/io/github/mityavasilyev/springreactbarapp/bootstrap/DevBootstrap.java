@@ -1,14 +1,16 @@
 package io.github.mityavasilyev.springreactbarapp.bootstrap;
 
+import com.google.common.collect.Sets;
 import io.github.mityavasilyev.springreactbarapp.cocktail.Cocktail;
 import io.github.mityavasilyev.springreactbarapp.extra.*;
 import io.github.mityavasilyev.springreactbarapp.cocktail.CocktailRepository;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import io.github.mityavasilyev.springreactbarapp.product.Product;
 import io.github.mityavasilyev.springreactbarapp.product.ProductService;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUserPermission;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.AuthService;
-import io.github.mityavasilyev.springreactbarapp.security.role.Role;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import io.github.mityavasilyev.springreactbarapp.tag.TagRepository;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
 import lombok.RequiredArgsConstructor;
@@ -51,30 +53,27 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
 
         // Adding users and roles
-        Role role1 = new Role(1l, "root_user");
-        authService.saveRole(role1);
-        Role role2 = new Role(2l, "regular_user");
-        authService.saveRole(role2);
-        Role role3 = new Role(3l, "moderator_user");
-        authService.saveRole(role3);
-
         AppUser appUser1 = AppUser.builder()
                 .id(1L)
                 .name("Admin")
                 .username("admin")
                 .password("root")
-                .roles(Arrays.asList(role1, role2))
+                .authorities(Sets.newHashSet(AppUserRole.ADMIN.getGrantedAuthorities()))
+                .isAccountNonExpired(true)
+                .isAccountNonLocked(true)
+                .isCredentialsNonExpired(true)
+                .isEnabled(true)
                 .build();
         authService.saveUser(appUser1);
 
-        AppUser appUser2 = AppUser.builder()
-                .id(2L)
-                .name("Bob TheDude")
-                .username("bob")
-                .password("bobrules69")
-                .roles(List.of(role2))
-                .build();
-        authService.saveUser(appUser2);
+//        AppUser appUser2 = AppUser.builder()
+//                .id(2L)
+//                .name("Bob TheDude")
+//                .username("bob")
+//                .password("bobrules69")
+//                .roles(List.of(appUserPermission2))
+//                .build();
+//        authService.saveUser(appUser2);
 
 
         // Adding tags
