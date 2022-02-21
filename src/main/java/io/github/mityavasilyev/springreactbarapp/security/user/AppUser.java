@@ -3,11 +3,14 @@ package io.github.mityavasilyev.springreactbarapp.security.user;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @ToString
@@ -51,16 +54,28 @@ public class AppUser implements UserDetails {
 
     private boolean isEnabled;
 
-    @ElementCollection
-    private Set<GrantedAuthority> authorities;
+    @ElementCollection(targetClass = AppUserPermission.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "app_user_permissions")
+    private Set<AppUserPermission> permissions;
+
+    @ElementCollection(targetClass = AppUserRole.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "app_user_roles")
+    private Set<AppUserRole> roles;
 
     /**
      * Returns the authorities granted to the user. Cannot return <code>null</code>.
      *
      * @return the authorities, sorted by natural key (never <code>null</code>)
      */
-    @Override
     public Set<GrantedAuthority> getAuthorities() {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        permissions.forEach(appUserPermission ->
+                        authorities.add(new SimpleGrantedAuthority(appUserPermission.getPermission())));
+        roles.forEach(appUserRole ->
+                authorities.addAll(appUserRole.getGrantedAuthorities())
+        );
         return authorities;
     }
 

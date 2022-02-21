@@ -2,24 +2,27 @@ package io.github.mityavasilyev.springreactbarapp.bootstrap;
 
 import com.google.common.collect.Sets;
 import io.github.mityavasilyev.springreactbarapp.cocktail.Cocktail;
-import io.github.mityavasilyev.springreactbarapp.extra.*;
 import io.github.mityavasilyev.springreactbarapp.cocktail.CocktailRepository;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
+import io.github.mityavasilyev.springreactbarapp.extra.Recipe;
+import io.github.mityavasilyev.springreactbarapp.extra.Unit;
 import io.github.mityavasilyev.springreactbarapp.product.Product;
 import io.github.mityavasilyev.springreactbarapp.product.ProductService;
-import io.github.mityavasilyev.springreactbarapp.security.user.AppUserPermission;
-import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.AuthService;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
-import io.github.mityavasilyev.springreactbarapp.tag.TagRepository;
 import io.github.mityavasilyev.springreactbarapp.tag.Tag;
+import io.github.mityavasilyev.springreactbarapp.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Bootstrap class. Sorta playground
@@ -58,7 +61,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                 .name("Admin")
                 .username("admin")
                 .password("root")
-                .authorities(Sets.newHashSet(AppUserRole.ADMIN.getGrantedAuthorities()))
+                .roles(Sets.newHashSet(AppUserRole.ADMIN))
                 .isAccountNonExpired(true)
                 .isAccountNonLocked(true)
                 .isCredentialsNonExpired(true)
@@ -129,7 +132,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                                 .unit(Unit.OUNCE)
                                 .sourceProduct(bacardi)
                                 .build()
-                        )))
+                )))
                 .tags(new HashSet<>(Arrays.asList(
                         rumTag, sweetTag, coldTag
                 )))
@@ -194,5 +197,7 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                 .recipe(Recipe.builder().steps("Pour gin first, then the rest").build())
                 .build();
         cocktailRepository.save(cocktail3);
+
+        authService.getUsers();
     }
 }

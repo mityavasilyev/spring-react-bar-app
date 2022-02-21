@@ -27,7 +27,7 @@ public enum AppUserRole {
         this.permissions = permissions;
     }
 
-    private Set<AppUserPermission> getPermissions() {
+    public Set<AppUserPermission> getPermissions() {
         return permissions;
     }
 
