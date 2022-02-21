@@ -43,7 +43,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
         } catch (IOException e) {
             log.error("Error during authentication attempt");
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -69,6 +68,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     protected void unsuccessfulAuthentication(HttpServletRequest request,
                                               HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
+        log.warn("New failed attempt to login. Caused by: {}", failed.getMessage());
         super.unsuccessfulAuthentication(request, response, failed);
     }
 
