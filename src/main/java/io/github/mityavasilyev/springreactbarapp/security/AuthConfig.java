@@ -3,6 +3,7 @@ package io.github.mityavasilyev.springreactbarapp.security;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtConfig;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtTokenVerificationFilter;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import javax.crypto.SecretKey;
 
@@ -37,7 +39,10 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .csrf()
+                    .ignoringAntMatchers("/login")
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Since using JWTs
                 .and()
@@ -50,7 +55,8 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
                                 jwtConfig),
                         JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/", "/login").permitAll()
+                .antMatchers("/login").permitAll()
+                .antMatchers("/api/auth/**").hasRole(AppUserRole.ADMIN.name())
                 .anyRequest().authenticated();
     }
 
