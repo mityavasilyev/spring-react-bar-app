@@ -40,21 +40,21 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
-                    .ignoringAntMatchers("/login")
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .ignoringAntMatchers("/login")  // No need for CSRF when logging in
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Cookie based
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Since using JWTs
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stop tracking sessions since using JWTs
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(  // Authenticate user
                         authenticationManager(),
                         jwtConfig,
                         secretKey))
-                .addFilterAfter(new JwtTokenVerificationFilter(
+                .addFilterAfter(new JwtTokenVerificationFilter(     // Verify provided JWT if there's one
                                 secretKey,
                                 jwtConfig),
                         JwtUsernameAndPasswordAuthenticationFilter.class)
-                .authorizeRequests()
+                .authorizeRequests()    // Configuring path access rules
                 .antMatchers("/login").permitAll()
                 .antMatchers("/api/auth/**").hasRole(AppUserRole.ADMIN.name())
                 .anyRequest().authenticated();
@@ -68,8 +68,8 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder);
-        provider.setUserDetailsService(authService);
+        provider.setPasswordEncoder(passwordEncoder);   // Providing default password encoder
+        provider.setUserDetailsService(authService);    // Providing access to users repository
 
         return provider;
     }

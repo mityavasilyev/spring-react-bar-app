@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 
 import static io.github.mityavasilyev.springreactbarapp.security.user.AppUserPermission.*;
 
+/**
+ * Contains Roles that are preconfigured permission bundles
+ */
 public enum AppUserRole {
 
     BARTENDER(Sets.newHashSet(
@@ -27,10 +30,16 @@ public enum AppUserRole {
         this.permissions = permissions;
     }
 
+    /**
+     * @return Enum Permissions that are bundled in role
+     */
     public Set<AppUserPermission> getPermissions() {
         return permissions;
     }
 
+    /**
+     * @return Role and bundled permissions that are converted to GrantedAuthorities
+     */
     public Set<SimpleGrantedAuthority> getGrantedAuthorities() {
         Set<SimpleGrantedAuthority> authorities = getPermissions().stream()
                 .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))

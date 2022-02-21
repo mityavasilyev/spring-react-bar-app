@@ -48,21 +48,26 @@ public class JwtTokenVerificationFilter extends OncePerRequestFilter {
         // Trimming header
         String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
         try {
+            // Parsing JWT
             Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(secretKey)
                     .parseClaimsJws(token);
 
+            // Building user from token
             Claims body = claimsJws.getBody();
             String username = body.getSubject();
             Collection<Map<String, String>> authorities = (List<Map<String, String>>) body.get("authorities");
 
+            // Accessing user's authorities
             Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authorities.stream()
                     .map(entry -> new SimpleGrantedAuthority(entry.get("authority")))
                     .collect(Collectors.toSet());
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, simpleGrantedAuthorities);
 
+            // Passing authentication down
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
         } catch (JwtException exception) {
             log.error("Failed to verify token for request [{}]", request.getRequestURL());
             throw new IllegalStateException(String.format("JWT Token failed to pass verification"));

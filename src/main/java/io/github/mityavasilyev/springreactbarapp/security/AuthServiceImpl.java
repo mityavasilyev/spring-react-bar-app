@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +27,12 @@ public class AuthServiceImpl implements AuthService {
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Saves provided user
+     *
+     * @param appUser User to save
+     * @return  Saved user
+     */
     @Override
     public AppUser saveUser(AppUser appUser) {
         log.info("Saving user to the database: id[{}] username[{}]", appUser.getId(), appUser.getUsername());
@@ -35,6 +40,12 @@ public class AuthServiceImpl implements AuthService {
         return appUserRepository.save(appUser);
     }
 
+    /**
+     * Gets user with matching id
+     *
+     * @param id ID of user to search for
+     * @return  AppUser with provided ID if found. Throws ResponseStatusException otherwise
+     */
     @Override
     public AppUser getUser(Long id) {
         log.info("Fetching user by id {}", id.toString());
@@ -46,6 +57,12 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Gets user with matching username
+     *
+     * @param username Username of user to search for
+     * @return  AppUser with provided username if found. Throws ResponseStatusException otherwise
+     */
     @Override
     public AppUser getUser(String username) {
         log.info("Fetching user by username {}", username);
@@ -57,12 +74,22 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Gets all users
+     *
+     * @return List of all users
+     */
     @Override
     public List<AppUser> getUsers() {
         log.info("Fetching all users");
-        return new ArrayList<>(appUserRepository.findAll());
+        return appUserRepository.findAll();
     }
 
+    /**
+     * Gets all roles
+     *
+     * @return List of all roles
+     */
     @Override
     public List<AppUserRole> getRoles() {
         log.info("Fetching all roles");
@@ -84,6 +111,5 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(
                         () -> new UsernameNotFoundException(String.format("No such user: %s", username))
                 );
-
     }
 }
