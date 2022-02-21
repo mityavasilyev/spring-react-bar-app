@@ -24,10 +24,16 @@ public class JwtConfig {
     public JwtConfig() {
     }
 
+    /**
+     * Returns name of header containing auth JSON Web Token
+     */
     public String getAuthorizationHeader() {
         return HttpHeaders.AUTHORIZATION;
     }
 
+    /**
+     * Returns secret key entity for JWT generation and verification
+     */
     @Bean
     public SecretKey secretKey() {
         return Keys.hmacShaKeyFor(getSecretKey().getBytes());

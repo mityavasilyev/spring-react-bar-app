@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 
 @ToString
@@ -27,12 +26,8 @@ public class AppUser implements UserDetails {
     public static final String JSON_FIELD_PASSWORD = "password";
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.IDENTITY
-    )
-    @Column(
-            updatable = false
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(updatable = false)
     private Long id;
 
     private String name;
@@ -41,9 +36,7 @@ public class AppUser implements UserDetails {
             nullable = false)
     private String username;
 
-    @Column(
-            nullable = false
-    )
+    @Column(nullable = false)
     private String password;
 
     private boolean isAccountNonExpired;
@@ -66,13 +59,15 @@ public class AppUser implements UserDetails {
 
     /**
      * Returns the authorities granted to the user. Cannot return <code>null</code>.
+     * Collects authorities that are assigned directly to user and then those that are
+     * assigned to user's roles
      *
      * @return the authorities, sorted by natural key (never <code>null</code>)
      */
     public Set<GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();
         permissions.forEach(appUserPermission ->
-                        authorities.add(new SimpleGrantedAuthority(appUserPermission.getPermission())));
+                authorities.add(new SimpleGrantedAuthority(appUserPermission.getPermission())));
         roles.forEach(appUserRole ->
                 authorities.addAll(appUserRole.getGrantedAuthorities())
         );

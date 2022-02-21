@@ -1,5 +1,8 @@
 package io.github.mityavasilyev.springreactbarapp.security.user;
 
+/**
+ * Contains specific permissions for certain actions
+ */
 public enum AppUserPermission {
 
     COCKTAILS_READ("cocktails:read"),

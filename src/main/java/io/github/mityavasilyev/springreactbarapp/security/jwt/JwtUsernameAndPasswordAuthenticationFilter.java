@@ -2,8 +2,6 @@ package io.github.mityavasilyev.springreactbarapp.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,6 +29,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                                                 HttpServletResponse response) throws AuthenticationException {
 
         try {
+            //Basic authentication
             UsernameAndPasswordAuthenticationRequest authenticationRequest = new ObjectMapper()
                     .readValue(request.getInputStream(), UsernameAndPasswordAuthenticationRequest.class);
             Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -54,14 +53,17 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                                             Authentication authResult) throws IOException, ServletException {
 
         log.info("New login for user [{}]", authResult.getName());
-        JwtProvider.AccessRefreshTokens accessRefreshTokens = JwtProvider.generateTokens(
+
+        // Generating token
+        String accessToken = JwtProvider.generateToken(
                 authResult,
                 jwtConfig.getTokenExpirationAfterDays(),
                 secretKey);
 
+        // Attaching token to response
         response.addHeader(
                 jwtConfig.getAuthorizationHeader(),
-                jwtConfig.getTokenPrefix() + accessRefreshTokens.accessToken());
+                jwtConfig.getTokenPrefix() + accessToken);
     }
 
     @Override
