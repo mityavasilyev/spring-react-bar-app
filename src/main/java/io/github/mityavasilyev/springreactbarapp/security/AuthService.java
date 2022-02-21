@@ -1,24 +1,21 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
-import io.github.mityavasilyev.springreactbarapp.security.role.Role;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
 
-public interface AuthService {
+public interface AuthService extends UserDetailsService {
 
     AppUser saveUser(AppUser appUser);
 
-    Role saveRole(Role role);
-
-    void assignRoleToUser(String username, Long roleId);
-
     AppUser getUser(Long id);
 
-    Role getRole(Long id);
+    AppUser getUser(String username);
 
     List<AppUser> getUsers();
 
-    List<Role> getRoles();
+    List<AppUserRole> getRoles();
 
 }

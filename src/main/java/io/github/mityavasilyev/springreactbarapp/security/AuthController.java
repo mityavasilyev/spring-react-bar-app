@@ -1,21 +1,18 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
-import io.github.mityavasilyev.springreactbarapp.security.role.Role;
-import io.github.mityavasilyev.springreactbarapp.security.role.RoleDTO;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
-import io.github.mityavasilyev.springreactbarapp.security.user.AppUserDTO;
+import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = AuthController.AUTH_SERVICE_PATH)
@@ -31,56 +28,38 @@ public class AuthController extends ExceptionController {
     }
 
     @GetMapping("/roles")
-    public ResponseEntity<List<Role>> getRoles() {
+    public ResponseEntity<List<AppUserRole>> getRoles() {
         return ResponseEntity.ok(authService.getRoles());
     }
 
-    @PostMapping("/user/save")
-    public ResponseEntity<AppUser> saveUser(@RequestBody AppUserDTO appUserDTO) {
-        URI uri = URI.create(
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path(AUTH_SERVICE_PATH + "/user/save").toUriString());
-        return ResponseEntity
-                .created(uri)
-                .body(authService.saveUser(parseAppUserDTOWithRoles(appUserDTO)));
+    @GetMapping("/refresh")
+    public ResponseEntity<Object> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Tried to refresh token");
+        return null;
     }
 
-    @PostMapping("/role/save")
-    public ResponseEntity<Role> saveRole(@RequestBody RoleDTO roleDTO) {
-        URI uri = URI.create(
-                ServletUriComponentsBuilder
-                        .fromCurrentContextPath()
-                        .path(AUTH_SERVICE_PATH + "/role/save").toUriString());
-        return ResponseEntity
-                .created(uri)
-                .body(authService.saveRole(roleDTO.parseRole()));
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Object> deleteUser(@PathVariable("userId") int id) {
+        log.info("Tried to delete user with id: {}", id);
+        return null;
     }
 
-    @PostMapping("user/{userId}/assignRole/{roleId}")
-    public ResponseEntity<Void> assignRoleToUser(
-            @PathVariable(name = "userId") Long userId, @PathVariable(name = "roleId") Long roleId) {
-        AppUser user = authService.getUser(userId);
-        authService.assignRoleToUser(user.getUsername(), roleId);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Parses DTO object to entity and retrieves actual roles list.
-     * Needed for preventing injections and relevant data
-     *
-     * @param appUserDTO DTO object that needs to be parsed
-     * @return parsed entity
-     */
-    private @NotNull AppUser parseAppUserDTOWithRoles(@NotNull AppUserDTO appUserDTO) {
-        AppUser appUser = appUserDTO.parseAppUser();
-        Collection<Role> roles = new HashSet<>();
-        Collection<RoleDTO> roleDTOS = appUserDTO.getRoles();
-        if (roleDTOS != null) {
-            roleDTOS.forEach(roleDTO -> roles.add(authService.getRole(roleDTO.getId())));
-        }
-        appUser.setRoles(roles);
-        return appUser;
-    }
+//    /**
+//     * Parses DTO object to entity and retrieves actual roles list.
+//     * Needed for preventing injections and relevant data
+//     *
+//     * @param appUserDTO DTO object that needs to be parsed
+//     * @return parsed entity
+//     */
+//    private @NotNull AppUser parseAppUserDTOWithRoles(@NotNull AppUserDTO appUserDTO) {
+//        AppUser appUser = appUserDTO.parseAppUser();
+//        Collection<AppUserPermission> appUserAuthorities = new HashSet<>();
+//        Collection<RoleDTO> roleDTOS = appUserDTO.getRoles();
+//        if (roleDTOS != null) {
+//            roleDTOS.forEach(roleDTO -> appUserAuthorities.add(authService.getRole(roleDTO.getId())));
+//        }
+//        appUser.setRoles(appUserAuthorities);
+//        return appUser;
+//    }
 
 }
