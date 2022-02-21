@@ -57,7 +57,6 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
 
         // Adding users and roles
         AppUser appUser1 = AppUser.builder()
-                .id(1L)
                 .name("Admin")
                 .username("admin")
                 .password("root")
@@ -69,14 +68,17 @@ public class DevBootstrap implements ApplicationListener<ContextRefreshedEvent> 
                 .build();
         authService.saveUser(appUser1);
 
-//        AppUser appUser2 = AppUser.builder()
-//                .id(2L)
-//                .name("Bob TheDude")
-//                .username("bob")
-//                .password("bobrules69")
-//                .roles(List.of(appUserPermission2))
-//                .build();
-//        authService.saveUser(appUser2);
+        AppUser appUser2 = AppUser.builder()
+                .name("Bob TheBartender")
+                .username("bob")
+                .password("bobrules69")
+                .roles(Sets.newHashSet(AppUserRole.BARTENDER))
+                .isAccountNonExpired(true)
+                .isAccountNonLocked(true)
+                .isCredentialsNonExpired(true)
+                .isEnabled(true)
+                .build();
+        authService.saveUser(appUser2);
 
 
         // Adding tags
