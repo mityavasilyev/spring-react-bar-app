@@ -57,6 +57,8 @@ public class AppUser implements UserDetails {
     @CollectionTable(name = "app_user_roles")
     private Set<AppUserRole> roles;
 
+    private String activeRefreshToken;
+
     /**
      * Returns the authorities granted to the user. Cannot return <code>null</code>.
      * Collects authorities that are assigned directly to user and then those that are

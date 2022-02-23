@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
+import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtProvider;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,5 +18,9 @@ public interface AuthService extends UserDetailsService {
     List<AppUser> getUsers();
 
     List<AppUserRole> getRoles();
+
+    String updateUserRefreshToken(String username, String refreshToken);
+
+    JwtProvider.AccessRefreshTokens refreshTokens(String refreshToken);
 
 }

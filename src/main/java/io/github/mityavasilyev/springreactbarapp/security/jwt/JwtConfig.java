@@ -18,8 +18,10 @@ import javax.crypto.SecretKey;
 public class JwtConfig {
 
     private String secretKey;
-    private String tokenPrefix;
-    private Integer tokenExpirationAfterDays;
+    private String tokenPrefix = "Bearer ";
+    private String refreshTokenHeader = "REFRESH_TOKEN";
+    private Integer accessTokenExpirationAfterHours = 1;
+    private Integer refreshTokenExpirationAfterDays = 1;
 
     public JwtConfig() {
     }
@@ -27,7 +29,7 @@ public class JwtConfig {
     /**
      * Returns name of header containing auth JSON Web Token
      */
-    public String getAuthorizationHeader() {
+    public static String getAuthorizationHeader() {
         return HttpHeaders.AUTHORIZATION;
     }
 
