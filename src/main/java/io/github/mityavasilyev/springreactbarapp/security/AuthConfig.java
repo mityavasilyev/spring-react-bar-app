@@ -40,7 +40,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
-                    .ignoringAntMatchers("/login")  // No need for CSRF when logging in
+                    .ignoringAntMatchers("/login", "/api/auth/refresh")  // No need for CSRF when logging in
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Cookie based
                 .and()
                 .sessionManagement()
@@ -48,6 +48,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(  // Authenticate user
                         authenticationManager(),
+                        authService,
                         jwtConfig,
                         secretKey))
                 .addFilterAfter(new JwtTokenVerificationFilter(     // Verify provided JWT if there's one
@@ -55,7 +56,7 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
                                 jwtConfig),
                         JwtUsernameAndPasswordAuthenticationFilter.class)
                 .authorizeRequests()    // Configuring path access rules
-                .antMatchers("/login").permitAll()
+                .antMatchers("/login", "/api/auth/refresh").permitAll()
                 .antMatchers("/api/auth/**").hasRole(AppUserRole.ADMIN.name())
                 .anyRequest().authenticated();
     }

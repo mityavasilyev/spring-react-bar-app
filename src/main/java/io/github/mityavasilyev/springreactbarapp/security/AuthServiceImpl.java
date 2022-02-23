@@ -1,8 +1,13 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
+import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtConfig;
+import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtProvider;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRepository;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.crypto.SecretKey;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +32,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
     /**
      * Saves provided user
@@ -81,6 +89,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public List<AppUser> getUsers() {
+        // TODO: 24.02.2022 Return as userdetails entities
         log.info("Fetching all users");
         return appUserRepository.findAll();
     }
@@ -95,6 +104,56 @@ public class AuthServiceImpl implements AuthService {
         log.info("Fetching all roles");
         List<AppUserRole> appUserRoles = Arrays.stream(AppUserRole.values()).toList();
         return appUserRoles;
+    }
+
+    @Override
+    public String updateUserRefreshToken(String username, String refreshToken) {
+        log.info("Updated refresh-token for user [{}]", username);
+        // TODO: 24.02.2022 validate username from token
+        AppUser appUser = getUser(username);
+        appUser.setActiveRefreshToken(refreshToken);
+        appUserRepository.save(appUser);
+        return appUser.getActiveRefreshToken();
+    }
+
+    @Override
+    public JwtProvider.AccessRefreshTokens refreshTokens(String refreshToken) {
+
+        // TODO: 24.02.2022 Handle errors and exceptions
+        // Parsing JWT
+        Jws<Claims> claimsJws = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(refreshToken);
+
+        // Building user from token
+        Claims body = claimsJws.getBody();
+        String username = body.getSubject();
+        log.info("User [{}] requested new tokens via refresh-token", username);
+
+        // Checking user's issued refresh token
+        AppUser appUser = getUser(username);
+        if (!appUser.getActiveRefreshToken().equals(refreshToken)) {
+            log.warn("Provided token [{}] do not matches one stored in db", refreshToken);
+            return null;
+        }
+
+        // Issuing new tokens
+        try {
+            JwtProvider.AccessRefreshTokens accessRefreshTokens = JwtProvider.generateTokens(
+                    loadUserByUsername(username),
+                    secretKey,
+                    jwtConfig.getAccessTokenExpirationAfterHours(),
+                    jwtConfig.getRefreshTokenExpirationAfterDays()
+            );
+
+            // Updating user's refresh token
+            String newRefreshToken = updateUserRefreshToken(username, accessRefreshTokens.refreshToken());
+            return new JwtProvider.AccessRefreshTokens(accessRefreshTokens.accessToken(), newRefreshToken);
+
+        } catch (ResponseStatusException e) {
+            log.error("No such user: [{}]", username);
+            return null;
+        }
     }
 
     /**

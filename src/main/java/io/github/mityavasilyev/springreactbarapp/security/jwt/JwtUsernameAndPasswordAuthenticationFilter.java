@@ -1,6 +1,7 @@
 package io.github.mityavasilyev.springreactbarapp.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.mityavasilyev.springreactbarapp.security.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +22,7 @@ import java.io.IOException;
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final AuthService authService;
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
 
@@ -54,16 +56,26 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
 
         log.info("New login for user [{}]", authResult.getName());
 
-        // Generating token
-        String accessToken = JwtProvider.generateToken(
+        // Generating tokens
+        JwtProvider.AccessRefreshTokens accessRefreshTokens = JwtProvider.generateTokens(
                 authResult,
-                jwtConfig.getTokenExpirationAfterDays(),
-                secretKey);
+                secretKey,
+                jwtConfig.getAccessTokenExpirationAfterHours(),
+                jwtConfig.getRefreshTokenExpirationAfterDays()
+                );
 
-        // Attaching token to response
+        // Updating user's active refresh token
+        String refreshToken = authService.updateUserRefreshToken(
+                authResult.getName(),
+                accessRefreshTokens.refreshToken());
+
+        // Attaching tokens to response
         response.addHeader(
                 jwtConfig.getAuthorizationHeader(),
-                jwtConfig.getTokenPrefix() + accessToken);
+                jwtConfig.getTokenPrefix() + accessRefreshTokens.accessToken());
+        response.addHeader(
+                jwtConfig.getRefreshTokenHeader(),
+                refreshToken);
     }
 
     @Override

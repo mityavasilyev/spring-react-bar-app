@@ -19,7 +19,8 @@ public class JwtConfig {
 
     private String secretKey;
     private String tokenPrefix;
-    private Integer tokenExpirationAfterDays;
+    private Integer accessTokenExpirationAfterHours = 1;
+    private Integer refreshTokenExpirationAfterDays = 1;
 
     public JwtConfig() {
     }
@@ -29,6 +30,10 @@ public class JwtConfig {
      */
     public String getAuthorizationHeader() {
         return HttpHeaders.AUTHORIZATION;
+    }
+
+    public String getRefreshTokenHeader() {
+        return "REFRESH_TOKEN";
     }
 
     /**

@@ -1,6 +1,7 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
+import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtProvider;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +31,22 @@ public class AuthController extends ExceptionController {
         return ResponseEntity.ok(authService.getRoles());
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtProvider.AccessRefreshTokens> refreshTokens(@RequestBody RefreshToken refreshToken) {
+        JwtProvider.AccessRefreshTokens tokens = authService.refreshTokens(refreshToken.refreshToken);
+        if (tokens == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok(tokens);
+        }
+    }
+
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable("userId") int id) {
         log.info("Tried to delete user with id: {}", id);
         return null;
+    }
+
+    private record RefreshToken(String refreshToken) {
     }
 }
