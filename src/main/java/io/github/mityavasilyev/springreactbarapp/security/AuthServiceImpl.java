@@ -89,6 +89,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public List<AppUser> getUsers() {
+        // TODO: 24.02.2022 Return as userdetails entities
         log.info("Fetching all users");
         return appUserRepository.findAll();
     }
