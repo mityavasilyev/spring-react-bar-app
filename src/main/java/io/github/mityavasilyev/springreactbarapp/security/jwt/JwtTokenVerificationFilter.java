@@ -37,7 +37,7 @@ public class JwtTokenVerificationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader(jwtConfig.getAuthorizationHeader());
+        String authorizationHeader = request.getHeader(JwtConfig.getAuthorizationHeader());
 
         if (Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())) {
             filterChain.doFilter(request, response);
@@ -70,7 +70,7 @@ public class JwtTokenVerificationFilter extends OncePerRequestFilter {
 
         } catch (JwtException exception) {
             log.error("Failed to verify token for request [{}]", request.getRequestURL());
-            throw new IllegalStateException(String.format("JWT Token failed to pass verification"));
+            throw new IllegalStateException("JWT Token failed to pass verification");
         }
 
         filterChain.doFilter(request, response);

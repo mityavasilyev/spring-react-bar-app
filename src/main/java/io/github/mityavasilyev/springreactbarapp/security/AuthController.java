@@ -1,11 +1,12 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
-import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
+import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtProvider;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public class AuthController extends ExceptionController {
     private final AuthServiceImpl authService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<AppUser>> getUsers() {
+    public ResponseEntity<List<? extends UserDetails>> getUsers() {
         return ResponseEntity.ok(authService.getUsers());
     }
 
@@ -30,9 +31,22 @@ public class AuthController extends ExceptionController {
         return ResponseEntity.ok(authService.getRoles());
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtProvider.AccessRefreshTokens> refreshTokens(@RequestBody RefreshTokenDTO refreshTokenDTO) {
+        JwtProvider.AccessRefreshTokens tokens = authService.refreshTokens(refreshTokenDTO.refreshToken);
+        if (tokens == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
+            return ResponseEntity.ok(tokens);
+        }
+    }
+
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable("userId") int id) {
         log.info("Tried to delete user with id: {}", id);
         return null;
+    }
+
+    private record RefreshTokenDTO(String refreshToken) {
     }
 }
