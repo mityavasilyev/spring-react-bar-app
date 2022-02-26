@@ -25,7 +25,7 @@ public abstract class ExceptionController {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handle(Exception ex,
                                          HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("Controller Error: " + ex.getMessage());
+        log.info("Controller Error: {}", ex.getMessage());
         if (ex instanceof NullPointerException) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

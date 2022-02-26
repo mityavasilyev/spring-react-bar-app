@@ -1,11 +1,13 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
 import io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionController;
+import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtConfig;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtProvider;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +16,14 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Secured({"ROLE_ADMIN"})
 @RequestMapping(path = AuthController.AUTH_SERVICE_PATH)
 public class AuthController extends ExceptionController {
 
     public static final String AUTH_SERVICE_PATH = "api/auth";
 
     private final AuthServiceImpl authService;
+    private final JwtConfig jwtConfig;
 
     @GetMapping("/users")
     public ResponseEntity<List<? extends UserDetails>> getUsers() {
@@ -37,7 +41,14 @@ public class AuthController extends ExceptionController {
         if (tokens == null) {
             return ResponseEntity.badRequest().build();
         } else {
-            return ResponseEntity.ok(tokens);
+            return ResponseEntity
+                    .ok()
+                    .header(JwtConfig.getAuthorizationHeader(),
+                            jwtConfig.getTokenPrefix() + tokens.accessToken())
+                    .header(jwtConfig.getRefreshTokenHeader(),
+                            tokens.refreshToken())
+                    .build();
+
         }
     }
 
