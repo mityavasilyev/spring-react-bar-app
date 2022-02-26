@@ -3,7 +3,6 @@ package io.github.mityavasilyev.springreactbarapp.security;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtConfig;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtTokenVerificationFilter;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
-import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,10 @@ import javax.crypto.SecretKey;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true,  // Enables @pre/post usages
+        securedEnabled = true,  // Checks if @secured must be enabled
+        jsr250Enabled = true)   // Allows @roleAllowed usage
 @RequiredArgsConstructor
 public class AuthConfig extends WebSecurityConfigurerAdapter {
 
@@ -40,24 +42,24 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
-                    .ignoringAntMatchers("/login", "/api/auth/refresh")  // No need for CSRF when logging in
+                    .ignoringAntMatchers("/login", "/api/auth/refresh")          // No need for CSRF when logging in
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // Cookie based
                 .and()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stop tracking sessions since using JWTs
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)   // Stop tracking sessions since using JWTs
                 .and()
-                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(  // Authenticate user
+                .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(             // Authenticate user
                         authenticationManager(),
                         authService,
                         jwtConfig,
                         secretKey))
-                .addFilterAfter(new JwtTokenVerificationFilter(     // Verify provided JWT if there's one
+                .addFilterAfter(new JwtTokenVerificationFilter(                        // Verify provided JWT if there's one
                                 secretKey,
                                 jwtConfig),
                         JwtUsernameAndPasswordAuthenticationFilter.class)
-                .authorizeRequests()    // Configuring path access rules
+                .authorizeRequests()                                                         // Configuring path access rules
                 .antMatchers("/login", "/api/auth/refresh").permitAll()
-                .antMatchers("/api/auth/**").hasRole(AppUserRole.ADMIN.name())
+//                .antMatchers("/api/auth/**").hasRole(AppUserRole.ADMIN.name())
                 .anyRequest().authenticated();
     }
 
