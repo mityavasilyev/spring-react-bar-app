@@ -8,6 +8,7 @@ import io.github.mityavasilyev.springreactbarapp.tag.TagService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
+@Secured({"ROLE_BARTENDER"})
 @RequestMapping(path = "api/cocktails")
 public class CocktailController extends ExceptionController {
 
@@ -97,7 +99,7 @@ public class CocktailController extends ExceptionController {
         Set<Tag> tags = new HashSet<>();
         Set<TagDTO> tagDTOS = cocktailDTO.getTags();
         if (tagDTOS != null) {
-            tagDTOS.forEach(tag -> tags.add(tagService.getById(tag.parseTagWithId().getId())));
+            tagDTOS.forEach(tag -> tags.add(tagService.getById(tag.getId())));
         }
         cocktail.setTags(tags);
         return cocktail;

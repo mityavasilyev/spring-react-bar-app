@@ -7,11 +7,13 @@ import io.github.mityavasilyev.springreactbarapp.exceptions.UnitMismatchExceptio
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@Secured({"ROLE_BARTENDER"})
 @RequestMapping(path = "api/products")
 public class ProductController extends ExceptionController {
 

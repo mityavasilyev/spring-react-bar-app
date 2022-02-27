@@ -4,14 +4,27 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=mityavasilyev_spring-react-bar-app&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=mityavasilyev_spring-react-bar-app)
 
 
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=mityavasilyev_spring-react-bar-app&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=mityavasilyev_spring-react-bar-app)
 <h1 align="center">
     Spring React Bar Assistant
 </h1>
 
-###Description
-<p>
-    Web App that aims to assist in managing your own bar. Keep track of spirits available 
-and manage cocktail recipes   
-</p>
+### Description
 
+Web App that aims to assist in managing your own bar. Keep track of spirits available 
+and manage cocktail recipes
+
+### Setup
+Configure `application.json` file in `/resources`
+
+### Stack
+**Framework**: Spring Boot
+
+**Data Storage**: Postgres
+
+**Security**: Spring Security + JWT
+
+**Tests**: Junit5 + Mockito
+
+**Extra**:
+- Guava - google's utils lib
+- Lombok - Cutting down boilerplate code

@@ -15,6 +15,7 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
+@Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;

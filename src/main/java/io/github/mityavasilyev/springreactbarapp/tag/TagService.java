@@ -1,6 +1,7 @@
 package io.github.mityavasilyev.springreactbarapp.tag;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
+@Transactional
 public class TagService {
 
     private TagRepository tagRepository;
