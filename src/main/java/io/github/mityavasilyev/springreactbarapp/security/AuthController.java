@@ -16,7 +16,6 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@Secured({"ROLE_ADMIN"})
 @RequestMapping(path = AuthController.AUTH_SERVICE_PATH)
 public class AuthController extends ExceptionController {
 
@@ -25,11 +24,13 @@ public class AuthController extends ExceptionController {
     private final AuthServiceImpl authService;
     private final JwtConfig jwtConfig;
 
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/users")
     public ResponseEntity<List<? extends UserDetails>> getUsers() {
         return ResponseEntity.ok(authService.getUsers());
     }
 
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/roles")
     public ResponseEntity<List<AppUserRole>> getRoles() {
         return ResponseEntity.ok(authService.getRoles());
@@ -52,6 +53,7 @@ public class AuthController extends ExceptionController {
         }
     }
 
+    @Secured({"ROLE_ADMIN"})
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Object> deleteUser(@PathVariable("userId") int id) {
         log.info("Tried to delete user with id: {}", id);

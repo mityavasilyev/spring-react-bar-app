@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
+import io.github.mityavasilyev.springreactbarapp.exceptions.InvalidUserException;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtConfig;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtProvider;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
@@ -39,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
      * Saves provided user
      *
      * @param appUser User to save
-     * @return  Saved user
+     * @return Saved user
      */
     @Override
     public AppUser saveUser(AppUser appUser) {
@@ -52,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
      * Gets user with matching id
      *
      * @param id ID of user to search for
-     * @return  AppUser with provided ID if found. Throws ResponseStatusException otherwise
+     * @return AppUser with provided ID if found. Throws ResponseStatusException otherwise
      */
     @Override
     public AppUser getUser(Long id) {
@@ -69,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
      * Gets user with matching username
      *
      * @param username Username of user to search for
-     * @return  AppUser with provided username if found. Throws ResponseStatusException otherwise
+     * @return AppUser with provided username if found. Throws ResponseStatusException otherwise
      */
     @Override
     public AppUser getUser(String username) {
@@ -89,7 +90,6 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public List<AppUser> getUsers() {
-        // TODO: 24.02.2022 Return as userdetails entities
         log.info("Fetching all users");
         return appUserRepository.findAll();
     }
@@ -107,12 +107,25 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String updateUserRefreshToken(String username, String refreshToken) {
-        log.info("Updated refresh-token for user [{}]", username);
-        // TODO: 24.02.2022 validate username from token
+    public String updateUserRefreshToken(String username, String refreshToken) throws InvalidUserException {
+        // Parsing JWT
+        Jws<Claims> claimsJws = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(refreshToken);
+        Claims body = claimsJws.getBody();
+        String usernameFromToken = body.getSubject();
+
+        if (!username.equalsIgnoreCase(usernameFromToken)) {
+            log.error("Provided username [{}] and one stored in token [{}] do not match", username, usernameFromToken);
+            throw new InvalidUserException(
+                    String.format("Provided username [%s] and username parsed from token [%s] do not match", username, usernameFromToken));
+        }
+
         AppUser appUser = getUser(username);
         appUser.setActiveRefreshToken(refreshToken);
         appUserRepository.save(appUser);
+
+        log.info("Updated refresh-token for user [{}]", username);
         return appUser.getActiveRefreshToken();
     }
 
@@ -150,7 +163,7 @@ public class AuthServiceImpl implements AuthService {
             String newRefreshToken = updateUserRefreshToken(username, accessRefreshTokens.refreshToken());
             return new JwtProvider.AccessRefreshTokens(accessRefreshTokens.accessToken(), newRefreshToken);
 
-        } catch (ResponseStatusException e) {
+        } catch (ResponseStatusException | InvalidUserException e) {
             log.error("No such user: [{}]", username);
             return null;
         }

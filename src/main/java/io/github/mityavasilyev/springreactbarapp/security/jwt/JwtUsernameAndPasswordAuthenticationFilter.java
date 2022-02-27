@@ -1,6 +1,7 @@
 package io.github.mityavasilyev.springreactbarapp.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.mityavasilyev.springreactbarapp.exceptions.InvalidUserException;
 import io.github.mityavasilyev.springreactbarapp.security.AuthService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,9 +66,14 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 );
 
         // Updating user's active refresh token
-        String refreshToken = authService.updateUserRefreshToken(
-                authResult.getName(),
-                accessRefreshTokens.refreshToken());
+        String refreshToken = null;
+        try {
+            refreshToken = authService.updateUserRefreshToken(
+                    authResult.getName(),
+                    accessRefreshTokens.refreshToken());
+        } catch (InvalidUserException e) {
+            log.error("Failed to save refreshToken for user {}", authResult.getName());
+        }
 
         // Attaching tokens to response
         response.addHeader(

@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
+import io.github.mityavasilyev.springreactbarapp.exceptions.InvalidUserException;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtProvider;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUser;
 import io.github.mityavasilyev.springreactbarapp.security.user.AppUserRole;
@@ -19,7 +20,7 @@ public interface AuthService extends UserDetailsService {
 
     List<AppUserRole> getRoles();
 
-    String updateUserRefreshToken(String username, String refreshToken);
+    String updateUserRefreshToken(String username, String refreshToken) throws InvalidUserException;
 
     JwtProvider.AccessRefreshTokens refreshTokens(String refreshToken);
 
