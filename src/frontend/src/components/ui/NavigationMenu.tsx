@@ -37,7 +37,7 @@ const NavigationMenu: React.FC<NavigationMenuInterface> = (props) => {
   const selectProfileHandler = () => {
     setSelectedMenu(menuStates.profile);
     console.log("Opening profile");
-    selectedMenu !== menuStates.profile && props.onSelectInventory();
+    selectedMenu !== menuStates.profile && props.onSelectProfile();
   };
 
   return (
