@@ -15,7 +15,16 @@ ReactDOM.render(
         horizontal: "center",
       }}
       transitionDuration={{ enter: 500, exit: 200 }}
-      style={{ borderRadius: themeConfig.borderRadius }}
+      iconVariant={{
+        success: "👍 ",
+        error: "❌ ",
+        warning: "⚠️ ",
+        info: "🤌 ",
+      }}
+      style={{
+        borderRadius: themeConfig.borderRadius,
+        fontSize: 15,
+      }}
     >
       <App />
     </SnackbarProvider>

@@ -5,7 +5,7 @@ interface componentsConfigInterface {
 
 const componentsConfig: componentsConfigInterface = {
   paperElevation: 16,
-  borderRadius: "25px",
+  borderRadius: "20px",
 };
 
 export default componentsConfig;
