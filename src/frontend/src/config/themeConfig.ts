@@ -1,11 +1,11 @@
 interface componentsConfigInterface {
   paperElevation: number;
-  borderRadius: number;
+  borderRadius: string;
 }
 
 const componentsConfig: componentsConfigInterface = {
   paperElevation: 16,
-  borderRadius: 4,
+  borderRadius: "25px",
 };
 
 export default componentsConfig;

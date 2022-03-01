@@ -21,4 +21,5 @@ In the project directory, you can run:
 **Extra**:
 - [Axios](https://axios-http.com/docs/intro) - HTTP requests
 - [Mui Icons](https://mui.com/components/icons/) - Icons
+- [Notistack](https://github.com/iamhosseindhv/notistack) - Notifications Stacking for MUI
 

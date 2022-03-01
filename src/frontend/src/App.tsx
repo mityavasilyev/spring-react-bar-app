@@ -1,29 +1,38 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
 import NavigationMenu from "./components/ui/NavigationMenu";
 import { createTheme, ThemeProvider, Typography } from "@mui/material";
-import Notification from "./components/notifications/Notification";
+import { useSnackbar } from "notistack";
 
 function App() {
   // Themes for further use with MUI
   const darkTheme = createTheme({ palette: { mode: "dark" } });
   const lightTheme = createTheme({ palette: { mode: "light" } });
 
-  const [message, setMessage] = useState("");
+  // Snackbar utility
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  const notificationClickHandler = () => {
+    closeSnackbar();
+  };
 
   const selectCocktailsSectionHandler = () => {
-    console.log("Loading cocktails");
-    console.log("Message is:" + message);
+    enqueueSnackbar("Selected cocktails section", {
+      onClick: notificationClickHandler,
+    });
   };
 
   const selectInventorySectionHandler = () => {
-    console.log("Loading inventory");
-    setMessage("");
+    enqueueSnackbar("Selected inventory section", {
+      onClick: notificationClickHandler,
+    });
   };
 
   const selectProfileSectionHandler = () => {
-    console.log("Loading profile");
-    setMessage("Hello there!");
+    enqueueSnackbar("Selected profile section", {
+      variant: "warning",
+      onClick: notificationClickHandler,
+    });
   };
 
   return (
@@ -40,8 +49,6 @@ function App() {
         <Typography variant={"h1"}>Hey</Typography>
         <Typography variant={"h1"}>Hey</Typography>
         <Typography variant={"h1"}>Hey</Typography>
-
-        <Notification message={message} />
 
         <ThemeProvider theme={darkTheme}>
           <NavigationMenu
