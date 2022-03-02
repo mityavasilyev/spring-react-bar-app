@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Box, IconButton, Paper, Stack, Toolbar, Tooltip } from "@mui/material";
+import {
+  Box,
+  Grid,
+  IconButton,
+  Paper,
+  Stack,
+  Toolbar,
+  Tooltip,
+} from "@mui/material";
 
 import LocalBarRoundedIcon from "@mui/icons-material/LocalBarRounded";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
@@ -41,7 +49,12 @@ const NavigationMenu: React.FC<NavigationMenuInterface> = (props) => {
   };
 
   return (
-    <Box position={"fixed"} sx={{ top: "auto", bottom: 0 }}>
+    <Grid
+      position={"fixed"}
+      justifyContent="center"
+      sx={{ width: "100%", top: "auto", bottom: 0 }}
+      container
+    >
       <Box sx={{ p: 2 }}>
         <Paper
           variant={"elevation"}
@@ -54,7 +67,7 @@ const NavigationMenu: React.FC<NavigationMenuInterface> = (props) => {
                 <LocalBarRoundedIcon
                   color={
                     selectedMenu === menuStates.cocktails
-                      ? "primary"
+                      ? "secondary"
                       : "inherit"
                   }
                   sx={iconStyle}
@@ -64,7 +77,7 @@ const NavigationMenu: React.FC<NavigationMenuInterface> = (props) => {
                 <Inventory2Icon
                   color={
                     selectedMenu === menuStates.inventory
-                      ? "primary"
+                      ? "secondary"
                       : "inherit"
                   }
                   sx={iconStyle}
@@ -73,7 +86,9 @@ const NavigationMenu: React.FC<NavigationMenuInterface> = (props) => {
               <MenuItem onClick={selectProfileHandler} tooltip={"Profile"}>
                 <PersonIcon
                   color={
-                    selectedMenu === menuStates.profile ? "primary" : "inherit"
+                    selectedMenu === menuStates.profile
+                      ? "secondary"
+                      : "inherit"
                   }
                   sx={iconStyle}
                 />
@@ -82,7 +97,7 @@ const NavigationMenu: React.FC<NavigationMenuInterface> = (props) => {
           </Toolbar>
         </Paper>
       </Box>
-    </Box>
+    </Grid>
   );
 };
 

@@ -1,59 +1,68 @@
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
-import NavigationMenu from "./components/ui/NavigationMenu";
-import { Box, createTheme, ThemeProvider, Typography } from "@mui/material";
-import { useSnackbar } from "notistack";
+import { createTheme, ThemeProvider } from "@mui/material";
+import MainScreen from "./components/ui/MainScreen";
+import themeConfig from "./config/themeConfig";
 
 function App() {
   // Themes for further use with MUI
-  const darkTheme = createTheme({ palette: { mode: "dark" } });
-  const lightTheme = createTheme({ palette: { mode: "light" } });
+  const darkTheme = createTheme({
+    palette: {
+      mode: "dark",
+      primary: {
+        main: "#4c44cf",
+      },
+      secondary: {
+        main: "#e953da",
+      },
+      background: {
+        default: "#2d2d2d",
+      },
+    },
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: themeConfig.borderRadius,
+            backgroundColor: "#2a2a2a",
+          },
+        },
+        defaultProps: {
+          elevation: themeConfig.paperElevation,
+        },
+      },
+    },
+  });
 
-  // Snackbar utility
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
-
-  // State variables
-  const [title, setTitle] = useState("Hello there");
-
-  const notificationClickHandler = () => {
-    closeSnackbar();
-  };
-
-  const selectCocktailsSectionHandler = () => {
-    enqueueSnackbar("Selected cocktails section", {
-      onClick: notificationClickHandler,
-    });
-  };
-
-  const selectInventorySectionHandler = () => {
-    enqueueSnackbar("Selected inventory section", {
-      onClick: notificationClickHandler,
-    });
-  };
-
-  const selectProfileSectionHandler = () => {
-    enqueueSnackbar("Selected profile section", {
-      variant: "warning",
-      onClick: notificationClickHandler,
-    });
-  };
+  const lightTheme = createTheme({
+    palette: {
+      mode: "light",
+      primary: {
+        main: "#4c44cf",
+      },
+      secondary: {
+        main: "#e953da",
+      },
+    },
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: themeConfig.borderRadius,
+          },
+        },
+        defaultProps: {
+          elevation: themeConfig.paperElevation,
+        },
+      },
+    },
+  });
 
   return (
     <div className="App">
-      <header className="App-header">
-        <Box height={"100%"} justifyContent={"center"}>
-          <Box height={"40%"} />
-          <Typography variant={"h1"}>{title}</Typography>
-        </Box>
-
-        <ThemeProvider theme={darkTheme}>
-          <NavigationMenu
-            onSelectCocktails={selectCocktailsSectionHandler}
-            onSelectInventory={selectInventorySectionHandler}
-            onSelectProfile={selectProfileSectionHandler}
-          />
-        </ThemeProvider>
-      </header>
+      <ThemeProvider theme={darkTheme}>
+        <MainScreen />
+      </ThemeProvider>
     </div>
   );
 }
