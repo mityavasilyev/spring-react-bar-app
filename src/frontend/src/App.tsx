@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import NavigationMenu from "./components/ui/NavigationMenu";
-import { createTheme, ThemeProvider, Typography } from "@mui/material";
+import { Box, createTheme, ThemeProvider, Typography } from "@mui/material";
 import { useSnackbar } from "notistack";
 
 function App() {
@@ -11,6 +11,9 @@ function App() {
 
   // Snackbar utility
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+
+  // State variables
+  const [title, setTitle] = useState("Hello there");
 
   const notificationClickHandler = () => {
     closeSnackbar();
@@ -38,17 +41,10 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
-        <Typography variant={"h1"}>Hey</Typography>
+        <Box height={"100%"} justifyContent={"center"}>
+          <Box height={"40%"} />
+          <Typography variant={"h1"}>{title}</Typography>
+        </Box>
 
         <ThemeProvider theme={darkTheme}>
           <NavigationMenu

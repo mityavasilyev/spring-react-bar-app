@@ -5,6 +5,12 @@ interface NotificationInterface {
   message: string;
 }
 
+/**
+ * Deprecated. Now using SnackbarProvider from notistack
+ *
+ * @param props
+ * @constructor
+ */
 const Notification: React.FC<NotificationInterface> = (props) => {
 
   const [displayNotification, setDisplayNotification] = useState(false);

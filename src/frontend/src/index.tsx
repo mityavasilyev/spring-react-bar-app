@@ -23,7 +23,7 @@ ReactDOM.render(
       }}
       style={{
         borderRadius: themeConfig.borderRadius,
-        fontSize: 15,
+        fontSize: themeConfig.notificationFontSize,
       }}
     >
       <App />
