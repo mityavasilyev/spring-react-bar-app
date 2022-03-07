@@ -1,9 +1,9 @@
 enum Unit {
-  ounce = "ounce",
-  milliliter = "milliliter",
-  liter = "liter",
-  gram = "gram",
-  piece = "piece"
+  ounce = "OUNCE",
+  milliliter = "MILLILITER",
+  liter = "LITER",
+  gram = "GRAM",
+  piece = "PIECE"
 }
 
 export default Unit;

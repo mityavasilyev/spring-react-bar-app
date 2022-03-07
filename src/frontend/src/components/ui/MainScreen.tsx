@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Container, Theme } from "@mui/material";
 import NavigationMenu from "./NavigationMenu";
 import { useSnackbar } from "notistack";
 import ProfileSection from "../profile/ProfileSection";
@@ -46,24 +45,16 @@ const MainScreen: React.FC = (props) => {
 
   return (
     <>
+      {section === Section.cocktails && <CocktailsSection />}
+      {section === Section.inventory && <InventorySection />}
+      {section === Section.profile && <ProfileSection />}
+
+      {/*Rendered in the end for proper components overlap*/}
       <NavigationMenu // Navigation
         onSelectCocktails={selectCocktailsSectionHandler}
         onSelectInventory={selectInventorySectionHandler}
         onSelectProfile={selectProfileSectionHandler}
       />
-
-      <Container // Actual sections
-        sx={{
-          bgcolor: (theme: Theme) => theme.palette.background.default,
-          height: "100vh",
-          width: "100vw",
-          p: 2,
-        }}
-      >
-        {section === Section.cocktails && <CocktailsSection />}
-        {section === Section.inventory && <InventorySection />}
-        {section === Section.profile && <ProfileSection />}
-      </Container>
     </>
   );
 };

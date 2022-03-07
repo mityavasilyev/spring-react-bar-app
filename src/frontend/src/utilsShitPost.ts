@@ -55,7 +55,7 @@ const exampleCocktails: Cocktail[] = JSON.parse(
     '            "id": 1,\n' +
     '            "steps": "Mix em together"\n' +
     "        },\n" +
-    '        "note": "Empty note"\n' +
+    '        "note": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium deserunt dolore illo necessitatibus voluptatibus? Adipisci dicta quam quisquam recusandae rem velit voluptatibus. Accusamus amet aut debitis minima, recusandae repellat repudiandae."\n' +
     "    }, {\n" +
     '        "id": 2,\n' +
     '        "name": "Mojito",\n' +
@@ -112,7 +112,7 @@ const exampleCocktails: Cocktail[] = JSON.parse(
     '            "id": 2,\n' +
     '            "steps": "Ya know the drill. Mix this stuff"\n' +
     "        },\n" +
-    '        "note": "with alco"\n' +
+    '        "note": "with alco Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium deserunt dolore illo necessitatibus voluptatibus? Adipisci dicta quam quisquam recusandae rem velit voluptatibus. Accusamus amet aut debitis minima, recusandae repellat repudiandae."\n' +
     "    }]"
 );
 

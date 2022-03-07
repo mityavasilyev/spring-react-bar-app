@@ -1,6 +1,6 @@
 import React from "react";
 import "./App.css";
-import { createTheme, ThemeProvider } from "@mui/material";
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import MainScreen from "./components/ui/MainScreen";
 import themeConfig from "./config/themeConfig";
 
@@ -10,10 +10,10 @@ function App() {
     palette: {
       mode: "dark",
       primary: {
-        main: "#4c44cf",
+        main: "#e0c01a",
       },
       secondary: {
-        main: "#e953da",
+        main: "#5247e5",
       },
       background: {
         default: "#2d2d2d",
@@ -24,11 +24,19 @@ function App() {
         styleOverrides: {
           root: {
             borderRadius: themeConfig.borderRadius,
-            backgroundColor: "#2a2a2a",
+            backgroundColor: "#2f2f2f",
           },
         },
         defaultProps: {
           elevation: themeConfig.paperElevation,
+        },
+      },
+      MuiModal: {
+        styleOverrides: {
+          root: {
+            overflow: "scroll",
+            backgroundColor: "rgba(38,38,38,0.84)",
+          },
         },
       },
     },
@@ -36,12 +44,15 @@ function App() {
 
   const lightTheme = createTheme({
     palette: {
+      background: {
+        default: "#f9f4ff",
+      },
       mode: "light",
       primary: {
-        main: "#4c44cf",
+        main: "#cbc8ff",
       },
       secondary: {
-        main: "#e953da",
+        main: "#d7f7ff",
       },
     },
     components: {
@@ -55,15 +66,24 @@ function App() {
           elevation: themeConfig.paperElevation,
         },
       },
+      MuiModal: {
+        styleOverrides: {
+          root: {
+            overflow: "scroll",
+            backgroundColor: "rgba(249,244,255,0.87)",
+          },
+        },
+      },
     },
   });
 
   return (
-    <div className="App">
+    <>
       <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
         <MainScreen />
       </ThemeProvider>
-    </div>
+    </>
   );
 }
 
