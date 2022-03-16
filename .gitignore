@@ -57,3 +57,4 @@ build/
 ### VS Code ###
 .vscode/
 >>>>>>> eb113f3 (Initial Commit)
+/src/frontend/node_modules/

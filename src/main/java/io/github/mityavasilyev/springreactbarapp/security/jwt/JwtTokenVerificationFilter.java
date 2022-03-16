@@ -1,6 +1,7 @@
 package io.github.mityavasilyev.springreactbarapp.security.jwt;
 
 import com.google.common.base.Strings;
+import io.github.mityavasilyev.springreactbarapp.security.exceptions.InvalidJwtTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
@@ -70,7 +71,7 @@ public class JwtTokenVerificationFilter extends OncePerRequestFilter {
 
         } catch (JwtException exception) {
             log.error("Failed to verify token for request [{}]", request.getRequestURL());
-            throw new IllegalStateException("JWT Token failed to pass verification");
+            throw new InvalidJwtTokenException("JWT Token failed to pass verification");
         }
 
         filterChain.doFilter(request, response);

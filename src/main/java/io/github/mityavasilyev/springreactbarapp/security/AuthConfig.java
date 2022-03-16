@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.security;
 
+import io.github.mityavasilyev.springreactbarapp.security.exceptions.ChainExceptionHandlerFilter;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtConfig;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtTokenVerificationFilter;
 import io.github.mityavasilyev.springreactbarapp.security.jwt.JwtUsernameAndPasswordAuthenticationFilter;
@@ -48,6 +49,8 @@ public class AuthConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)   // Stop tracking sessions since using JWTs
                 .and()
+                .addFilterBefore(new ChainExceptionHandlerFilter(),
+                        JwtUsernameAndPasswordAuthenticationFilter.class)
                 .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(             // Authenticate user
                         authenticationManager(),
                         authService,
