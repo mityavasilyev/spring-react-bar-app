@@ -1,6 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.security.exceptions;
 
-public class InvalidJwtTokenException extends RuntimeException {
+public class InvalidJwtTokenException extends SecurityException {
     public InvalidJwtTokenException() {
         super();
     }

@@ -1,5 +1,6 @@
 package io.github.mityavasilyev.springreactbarapp.product;
 
+import io.github.mityavasilyev.springreactbarapp.exceptions.DataNotFoundException;
 import io.github.mityavasilyev.springreactbarapp.exceptions.NotEnoughProductException;
 import io.github.mityavasilyev.springreactbarapp.exceptions.UnitMismatchException;
 import io.github.mityavasilyev.springreactbarapp.extra.Ingredient;
@@ -40,7 +41,7 @@ public class ProductService {
         if (product.isPresent()) {
             return product.get();
         } else {
-            throw new ResponseStatusException(NOT_FOUND, "No product with such id");
+            throw new DataNotFoundException("No product with such id");
         }
     }
 

@@ -11,12 +11,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+
+import static io.github.mityavasilyev.springreactbarapp.exceptions.ExceptionUtils.buildErrorBody;
 
 @Slf4j
 @Component
-public class FilterChainExceptionHandler extends OncePerRequestFilter {
+public class ChainExceptionHandlerFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
@@ -26,18 +26,15 @@ public class FilterChainExceptionHandler extends OncePerRequestFilter {
 
         try {
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            log.error("Spring Security Filter Chain Exception:", e);
+        } catch (Exception ex) {
+            log.error("Spring Security Filter Chain Exception: {}", ex.getClass());
+            String errorBody = new ObjectMapper().writeValueAsString(buildErrorBody(ex.getMessage()));
 
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> responseBody = new HashMap<>();
-
-            if (e instanceof InvalidJwtTokenException) {
+            if (ex instanceof SecurityException) {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
-                responseBody.put("error", e.getMessage());
-                response.getWriter().write(mapper.writeValueAsString(responseBody));
+                response.getWriter().write(errorBody);
                 response.getWriter().flush();
-                filterChain.doFilter(request, response);
+//                filterChain.doFilter(request, response);
                 return;
             }
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

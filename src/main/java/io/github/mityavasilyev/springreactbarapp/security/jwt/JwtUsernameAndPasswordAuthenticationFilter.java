@@ -3,6 +3,7 @@ package io.github.mityavasilyev.springreactbarapp.security.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mityavasilyev.springreactbarapp.exceptions.InvalidUserException;
 import io.github.mityavasilyev.springreactbarapp.security.AuthService;
+import io.github.mityavasilyev.springreactbarapp.security.exceptions.SecurityException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -89,7 +90,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                                               HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
         log.warn("New failed attempt to login. Caused by: {}", failed.getMessage());
-        super.unsuccessfulAuthentication(request, response, failed);
+//        super.unsuccessfulAuthentication(request, response, failed);
+        throw new SecurityException(failed.getMessage());
     }
 
     private record UsernameAndPasswordAuthenticationRequest(String username, String password) {
