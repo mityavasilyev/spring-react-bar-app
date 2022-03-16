@@ -34,7 +34,6 @@ public class ChainExceptionHandlerFilter extends OncePerRequestFilter {
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.getWriter().write(errorBody);
                 response.getWriter().flush();
-//                filterChain.doFilter(request, response);
                 return;
             }
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

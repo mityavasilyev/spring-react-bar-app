@@ -9,17 +9,17 @@ import java.util.Map;
 
 @Slf4j
 public class ExceptionUtils {
-    public static final String JSON_FIELD_ERROR = "error_message";
+    private static final String JSON_FIELD_ERROR = "error_message";
 
     /**
      * @param errorMessage Message describing the problem
      * @param extraObject  Some extra payload if necessary
      * @return standardized error body
      */
-    public static Map buildErrorBody(String errorMessage, Object extraObject) {
+    public static Map<String, String> buildErrorBody(String errorMessage, Object extraObject) {
         Map<String, String> body = new HashMap<>();
 
-        body.put("error_message", errorMessage);
+        body.put(JSON_FIELD_ERROR, errorMessage);
         try {
             if (extraObject != null) body.put("more_info", new ObjectMapper().writeValueAsString(extraObject));
         } catch (JsonProcessingException e) {
@@ -28,7 +28,7 @@ public class ExceptionUtils {
         return body;
     }
 
-    public static Map buildErrorBody(String errorMessage) {
+    public static Map<String, String> buildErrorBody(String errorMessage) {
         return buildErrorBody(errorMessage, null);
     }
 }

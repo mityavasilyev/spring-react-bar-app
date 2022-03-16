@@ -90,7 +90,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                                               HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
         log.warn("New failed attempt to login. Caused by: {}", failed.getMessage());
-//        super.unsuccessfulAuthentication(request, response, failed);
         throw new SecurityException(failed.getMessage());
     }
 
