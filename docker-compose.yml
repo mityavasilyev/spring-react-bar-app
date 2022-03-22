@@ -1,7 +1,15 @@
+version: "3"
+
 services:
   bartenderly:
     container_name: bartenderly
-    build: spr
+    build: bartenderly-server
+    ports:
+      - "8080:8080"
+    networks:
+      - back
+    depends_on:
+      - postgres
   postgres:
     container_name: postgres
     image: postgres
@@ -9,14 +17,17 @@ services:
       POSTGRES_USER: dev_user
       POSTGRES_PASSWORD: dev_user
       POSTGRES_DB: dev
-      PGDATA: /data/postgres
-    volumes:
-      - postgres:/data/postgres
+#      PGDATA: /data/postgres
+#    volumes:
+#      - postgres:/data/postgres
     ports:
       - "5432:5432"
+    networks:
+      - back
     restart: unless-stopped
+
 networks:
-  postgres:
+  back:
     driver: bridge
-volumes:
-  postgres:
+#volumes:
+#  postgres:
