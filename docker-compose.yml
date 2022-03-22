@@ -1,4 +1,7 @@
 services:
+  bartenderly:
+    container_name: bartenderly
+    build: spr
   postgres:
     container_name: postgres
     image: postgres
