@@ -14,7 +14,7 @@ Web App that aims to assist in managing your own bar. Keep track of spirits avai
 and manage cocktail recipes
 
 ### Setup
-Configure `application.json` file in `/resources`
+Configure `application.properties` file in `/resources`
 
 ### Stack
 **Framework**: Spring Boot
